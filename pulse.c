@@ -484,9 +484,9 @@ source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void*
     {
       for (size_t i = 0; i < si->n_ports; i++)
         {
-          printf("+++ pa_source_port_info name %d: %s\n", i, si->ports[i]->name);
-          printf("+++ pa_source_port_info priority %d: %d\n", i, si->ports[i]->priority);
-          printf("+++ pa_source_port_info avail %d: %d\n", i, si->ports[i]->available == PA_PORT_AVAILABLE_YES);
+          printf("+++ pa_source_port_info name %ld: %s\n", i, si->ports[i]->name);
+          printf("+++ pa_source_port_info priority %ld: %d\n", i, si->ports[i]->priority);
+          printf("+++ pa_source_port_info avail %ld: %d\n", i, si->ports[i]->available == PA_PORT_AVAILABLE_YES);
         }
       printf("+++ pa_source_port_info active port name: %s\n", si->active_port->name);
       printf("\n");
