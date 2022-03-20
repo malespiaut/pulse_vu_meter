@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 
+<!-- Generated with glade 3.38.2 
 
 Spark Gap Radio PulseAudio Meters - 
 Copyright (C) 2019 Kevin C. O'Kane
@@ -28,35 +28,32 @@ Author: Kevin C. O'Kane
   <!-- interface-copyright 2019 Kevin C. O'Kane -->
   <!-- interface-authors Kevin C. O'Kane -->
   <object class="GtkWindow" id="window">
-    <property name="can_focus">False</property>
+    <property name="can-focus">False</property>
     <property name="title" translatable="yes">SGR Meters</property>
-    <property name="icon_name">audio-speakers</property>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
+    <property name="icon-name">audio-speakers</property>
     <child>
       <object class="GtkFixed" id="fixed1">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <child>
           <object class="GtkDrawingArea" id="draw1">
-            <property name="width_request">400</property>
-            <property name="height_request">105</property>
+            <property name="width-request">400</property>
+            <property name="height-request">105</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_left">2</property>
-            <property name="margin_right">2</property>
-            <property name="margin_top">2</property>
-            <property name="margin_bottom">2</property>
+            <property name="can-focus">False</property>
+            <property name="margin-left">2</property>
+            <property name="margin-right">2</property>
+            <property name="margin-top">2</property>
+            <property name="margin-bottom">2</property>
             <signal name="draw" handler="on_draw1_draw" swapped="no"/>
           </object>
         </child>
         <child>
           <object class="GtkImage" id="vumeter1">
-            <property name="width_request">100</property>
-            <property name="height_request">80</property>
+            <property name="width-request">100</property>
+            <property name="height-request">80</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="resource">/part1/icons/meter.png</property>
           </object>
           <packing>
@@ -65,10 +62,10 @@ Author: Kevin C. O'Kane
         </child>
         <child>
           <object class="GtkImage" id="vumeter2">
-            <property name="width_request">100</property>
-            <property name="height_request">80</property>
+            <property name="width-request">100</property>
+            <property name="height-request">80</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="resource">/part1/icons/meter.png</property>
           </object>
           <packing>
@@ -78,10 +75,10 @@ Author: Kevin C. O'Kane
         </child>
         <child>
           <object class="GtkImage" id="vumeter3">
-            <property name="width_request">100</property>
-            <property name="height_request">80</property>
+            <property name="width-request">100</property>
+            <property name="height-request">80</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="resource">/part1/icons/meter.png</property>
           </object>
           <packing>
@@ -91,10 +88,10 @@ Author: Kevin C. O'Kane
         </child>
         <child>
           <object class="GtkDrawingArea" id="draw2">
-            <property name="width_request">400</property>
-            <property name="height_request">74</property>
+            <property name="width-request">400</property>
+            <property name="height-request">74</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <signal name="draw" handler="on_draw2_draw" swapped="no"/>
           </object>
           <packing>
