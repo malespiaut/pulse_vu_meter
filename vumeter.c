@@ -60,56 +60,6 @@ main(int argc, char* argv[])
 
   signal(SIGPIPE, SIG_IGN);
 
-  context_source = NULL;
-  context_sink = NULL;
-  stream_sink = NULL;
-  stream_source = NULL;
-  device_name_source = NULL;
-  device_name_sink = NULL;
-  device_description_source = NULL;
-  device_description_sink = NULL;
-  showArc = 0;
-  showB2 = 1;
-  connect_graph = TRUE; // whether to connect the bar graph bars
-  spectrum_width = 1;
-  display_cover = 0;
-  no_graph = 0;
-  legacy_vumeters = 0;
-  mono_graph = 0;
-  timer_res = 50;
-  no_meters = 0;
-  LAT = 3;
-  rand_colors = 0;
-  strcpy(bg_color, "black");
-  L_Clipping = 0;
-  R_Clipping = 0;
-  style = NARROW_SPECTRUM; // narrow
-  FACTOR = 350.0;
-  Lx = 0.1;
-  Rx = 0.1;
-  strcpy(default_source, "");
-  strcpy(default_sink, "");
-  no_microphone = 1;
-  exchange = 0;
-  super_bars = 1; // bars above graphs
-  MaxR[0] = 0.0;
-  MaxR[1] = 0.0;
-  MaxL[0] = 0.0;
-  MaxL[1] = 0.0;
-  MaxM[0] = 0.0;
-  MaxM[1] = 0.0;
-  MaxRM = 0.0;
-  MaxLM = 0.0;
-  MaxMM = 0.0;
-  MRr = 0;
-  MLr = 0;
-  MMr = 0;
-  ML = 0.0;
-  MR = 0.0;
-  Balance = 0.0;
-  MLx = 0.0;
-  MRx = 0.0;
-
   gtk_init(&argc, &argv); // init Gtk
 
   printf("\n-----------------------------------------------\n");
