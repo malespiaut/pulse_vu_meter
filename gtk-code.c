@@ -46,11 +46,6 @@
 
 #include "global-extern-variables.h"
 
-static const pa_sample_spec sampSpec = {
-  .format = PA_SAMPLE_FLOAT32LE,
-  .rate = 44100,
-  .channels = 2};
-
 //--------------------------------------------------------------------
 //	main timer process
 //	called every 100 milliseconds to update the meteres and graphs.
