@@ -1191,8 +1191,6 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
 //--------------------------------------------------
 
 #define WindowWidth 200
-int width = WindowWidth; // two times the display window - half left, half right
-int numBars = WindowWidth / 2;
 
 int maxHeight = 100; // display window max from midpoint
 
@@ -1207,7 +1205,7 @@ fftTobars(fftw_complex* fft, int size, int* bars)
 
   i = 0; // fft index
 
-  for (size_t bar = 0; bar < numBars; bar++)
+  for (size_t bar = 0; bar < WindowWidth / 2; bar++)
     { // average for each bar
 
       real = fft[i][0] * scale;
@@ -1248,8 +1246,7 @@ fftTobars(fftw_complex* fft, int size, int* bars)
 void
 spectrum()
 {
-
-  int size = SAMPLE_SIZE / 2;
+  size_t size = SAMPLE_SIZE / 2;
 
   static float* Hann = NULL;
   static double* in = NULL;
@@ -1274,7 +1271,7 @@ spectrum()
 
   fftw_plan plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_ESTIMATE);
 
-  int barsL[width / 2], barsR[width / 2];
+  int barsL[WindowWidth / 2], barsR[WindowWidth / 2];
 
   //	------------
   //	left channel
@@ -1295,7 +1292,7 @@ spectrum()
 
   double F = 1.0;
 
-  for (size_t i = 0; i < width / 2; i++)
+  for (size_t i = 0; i < WindowWidth / 2; i++)
     {
       if (barsL[i] < 0.0)
         {
@@ -1340,7 +1337,7 @@ spectrum()
   fftTobars(out, size, barsR);
 
   F = 1.0;
-  for (size_t i = 0; i < width / 2; i++)
+  for (size_t i = 0; i < WindowWidth / 2; i++)
     {
       if (barsR[i] < 0.0)
         {
