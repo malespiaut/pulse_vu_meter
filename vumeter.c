@@ -223,7 +223,6 @@ main(int argc, char* argv[])
 
         case 'B':
           connect_graph = TRUE;
-          display_bars = 1;
           break;
 
         case 'w':

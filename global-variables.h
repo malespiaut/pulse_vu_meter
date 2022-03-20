@@ -70,7 +70,7 @@ char bg_color[256];
 int L_Clipping, R_Clipping;
 int style;
 
-void bar_graph(int lower, double[], int, cairo_t*, int, int);
+void bar_graph(int lower, double[], int, cairo_t*, int);
 void color_bars(cairo_t* cr, int, int, int);
 void frequency_marks(cairo_t*);
 void draw_bars_only(cairo_t* cr, int lower, int i, double chan[]);

@@ -446,8 +446,6 @@ needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, i
   cairo_fill(cr); // fill in arc
 }
 
-int display_bars = 1;
-
 #define DRAW_HEIGHT 105.0
 
 float UPPER_MAX = DRAW_HEIGHT - DRAW_HEIGHT / 10.0;
@@ -551,18 +549,18 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
   for (size_t i = 0; i < 99; i++)
     { // draw graph
 
-      if ((!connect_graph || display_bars) && super_bars)
+      if (!connect_graph && super_bars)
         {
 
           if (slchan[i] > srchan[i])
-            {                                                               // show prominent color
-              color_bars(cr, i, noLine, YELLOW);                            // left channel color
-              bar_graph(UPPER, slchan, i, cr, connect_graph, display_bars); // draw left channel only
+            {                                                 // show prominent color
+              color_bars(cr, i, noLine, YELLOW);              // left channel color
+              bar_graph(UPPER, slchan, i, cr, connect_graph); // draw left channel only
             }
           else
             {
-              color_bars(cr, i, noLine, RED);                               // right channel color
-              bar_graph(LOWER, srchan, i, cr, connect_graph, display_bars); // draw right channel only
+              color_bars(cr, i, noLine, RED);                 // right channel color
+              bar_graph(LOWER, srchan, i, cr, connect_graph); // draw right channel only
             }
         }
 
@@ -570,10 +568,10 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
         {
 
           color_bars(cr, i, noLine, YELLOW); // left channel
-          bar_graph(UPPER, slchan, i, cr, connect_graph, display_bars);
+          bar_graph(UPPER, slchan, i, cr, connect_graph);
 
           color_bars(cr, i, noLine, RED); // right channel
-          bar_graph(LOWER, srchan, i, cr, connect_graph, display_bars);
+          bar_graph(LOWER, srchan, i, cr, connect_graph);
         }
     }
 
@@ -691,7 +689,7 @@ color_bars(cairo_t* cr, int i, int noLine, int color)
 //------------------------------------------
 
 void
-bar_graph(int lower, double chan[], int i, cairo_t* cr, int connect_graph, int display_bars)
+bar_graph(int lower, double chan[], int i, cairo_t* cr, int connect_graph)
 {
 
   if (chan[i] > G_LIM)
@@ -708,10 +706,7 @@ bar_graph(int lower, double chan[], int i, cairo_t* cr, int connect_graph, int d
       connecting_lines(cr, lower, i, chan); // connecting horizontal graph lines
     }
 
-  if (display_bars)
-    {
-      draw_bars_only(cr, lower, i, chan); // vertical bars
-    }
+  draw_bars_only(cr, lower, i, chan); // vertical bars
 }
 
 //-----------------------------

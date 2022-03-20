@@ -27,8 +27,6 @@
 
 // August 14, 2021
 
-extern int display_bars;
-
 extern pa_glib_mainloop* m_sink;   // internal audio - sink
 extern pa_glib_mainloop* m_source; // pulse audio microphone - source
 
@@ -69,7 +67,7 @@ extern char bg_color[256];
 extern int L_Clipping, R_Clipping;
 extern int style;
 
-extern void bar_graph(int lower, double[], int, cairo_t*, int, int);
+extern void bar_graph(int lower, double[], int, cairo_t*, int);
 extern void color_bars(cairo_t* cr, int, int, int);
 extern void frequency_marks(cairo_t*);
 extern void draw_bars_only(cairo_t* cr, int lower, int i, double chan[]);
