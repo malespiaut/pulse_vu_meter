@@ -688,6 +688,7 @@ source_connection_state_callback(pa_context* c, void* dummy)
 
     case PA_CONTEXT_TERMINATED:
       on_destroy();
+      break;
 
     default:
       printf("+++++ default\n");
@@ -745,6 +746,7 @@ sink_connection_state_callback(pa_context* c, void* dummy)
 
     case PA_CONTEXT_TERMINATED:
       on_destroy();
+      break;
 
     default:
       printf("+++++ default\n");
