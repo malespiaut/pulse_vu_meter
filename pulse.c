@@ -61,11 +61,6 @@ source_name()
   return x;
 }
 
-static const pa_sample_spec sampSpec = {
-  .format = PA_SAMPLE_FLOAT32LE,
-  .rate = 44100,
-  .channels = 2};
-
 void
 on_destroy()
 {
@@ -101,7 +96,6 @@ stream_read_callback_sink(pa_stream* s, size_t l, void* dmy)
 {
 
   const void* p;
-  static int count = 0;
 
   if (pa_stream_peek(s, &p, &l) < 0)
     {
@@ -164,8 +158,6 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
 {
 
   const void* p;
-  static int count = 0;
-  static float inData[5];
 
   if (no_microphone)
     {
