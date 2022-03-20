@@ -143,15 +143,10 @@ main(int argc, char* argv[])
 
   gtk_widget_show(window);
 
-  // GdkColor color; // default background color
-  GdkRGBA color = {
-    .red = 0.0,
-    .green = 0.0,
-    .blue = 0.0,
-    .alpha = 1.0
-  };
-
-  gtk_widget_modify_bg(window, GTK_STATE_NORMAL, &color); // set background color
+  GtkCssProvider* css_provider = gtk_css_provider_new();
+  gtk_css_provider_load_from_data(css_provider, "* { background-color: #000000; }", -1, 0);
+  GtkStyleContext* style_context = gtk_widget_get_style_context(window);
+  gtk_style_context_add_provider(style_context, GTK_STYLE_PROVIDER(css_provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 
   char cmd[1024];
   strcpy(cmd, "Spark Gap Radio Meters 2.1");
