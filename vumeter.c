@@ -68,7 +68,6 @@ main(int argc, char* argv[])
   device_name_sink = NULL;
   device_description_source = NULL;
   device_description_sink = NULL;
-  int record = 0;
   showArc = 0;
   showB2 = 1;
   connect_graph = TRUE; // whether to connect the bar graph bars
@@ -178,7 +177,7 @@ main(int argc, char* argv[])
   //	-h	help
   //	-?	help
 
-  int flags, opt;
+  int opt;
 
   while ((opt = getopt(argc, argv, "abcglmBwh?vs:")) != -1)
     {
