@@ -136,16 +136,22 @@ stream_read_callback_sink(pa_stream* s, size_t l, void* dmy)
         {
           float v = fabs(audio_data[c]);
           if (v > levels[c])
-            levels[c] = v;
+            {
+              levels[c] = v;
+            }
         }
       audio_data += nchan;
       samples -= nchan;
     }
 
   if (LeftChan < levels[0])
-    LeftChan = levels[0];
+    {
+      LeftChan = levels[0];
+    }
   if (RightChan < levels[1])
-    RightChan = levels[1];
+    {
+      RightChan = levels[1];
+    }
 
   pa_stream_drop(s);
 }
@@ -163,7 +169,9 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
   static float inData[5];
 
   if (no_microphone)
-    pa_stream_drop(s);
+    {
+      pa_stream_drop(s);
+    }
 
   if (pa_stream_peek(s, &p, &len) < 0)
     {
@@ -189,24 +197,34 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
         {
           float v = fabs(pcm[c]);
           if (v > levels[c])
-            levels[c] = v;
+            {
+              levels[c] = v;
+            }
         }
       pcm += nchan;
       samples -= nchan;
     }
 
   if (MLx < levels[0])
-    MLx = levels[0];
+    {
+      MLx = levels[0];
+    }
   if (MRx < levels[0])
-    MRx = levels[1];
+    {
+      MRx = levels[1];
+    }
 
   ML = MLx;
   MR = MRx;
 
   if (nchan == 2)
-    ML = (ML + MR) / 2; // average
+    {
+      ML = (ML + MR) / 2; // average
+    }
   else
-    MR = ML; // mono
+    {
+      MR = ML; // mono
+    }
 
   ML = log10(ML + 1) * (FACTOR - 20.0);
 
@@ -362,7 +380,9 @@ sink_create_stream(const char* name, const char* description,
                                           (enum pa_stream_flags)PA_STREAM_ADJUST_LATENCY);
 
   if (sink_err)
-    printf("*** stream connect error\n");
+    {
+      printf("*** stream connect error\n");
+    }
 }
 
 void
@@ -442,14 +462,20 @@ source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void*
   if (is_last < 0)
     {
       if (p == context_sink)
-        show_error_sink("Failed to get sink information");
+        {
+          show_error_sink("Failed to get sink information");
+        }
       else
-        show_error_source("Failed to get source information");
+        {
+          show_error_source("Failed to get source information");
+        }
       return;
     }
 
   if (!si)
-    return;
+    {
+      return;
+    }
 
   char txt[255];
 
@@ -495,14 +521,20 @@ sink_info_callback(pa_context* p, const pa_sink_info* si, int is_last, void* dmy
   if (is_last < 0)
     {
       if (p == context_sink)
-        show_error_sink("Failed to get sink information");
+        {
+          show_error_sink("Failed to get sink information");
+        }
       else
-        show_error_source("Failed to get source information");
+        {
+          show_error_source("Failed to get source information");
+        }
       return;
     }
 
   if (!si)
-    return;
+    {
+      return;
+    }
 
   sink_channels = si->channel_map.channels;
 
@@ -522,9 +554,13 @@ sink_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy)
   if (!si)
     {
       if (c == context_sink)
-        show_error_sink("Failed to get sink information");
+        {
+          show_error_sink("Failed to get sink information");
+        }
       else
-        show_error_source("Failed to get source information");
+        {
+          show_error_source("Failed to get source information");
+        }
       return;
     }
 
@@ -558,9 +594,13 @@ source_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy)
   if (!si)
     {
       if (c == context_sink)
-        show_error_sink("Failed to get sink information");
+        {
+          show_error_sink("Failed to get sink information");
+        }
       else
-        show_error_source("Failed to get source information");
+        {
+          show_error_source("Failed to get source information");
+        }
       return;
     }
 
@@ -646,7 +686,9 @@ source_connection_state_callback(pa_context* c, void* dmy)
     case PA_CONTEXT_FAILED:
 
       if (c == context_sink)
-        show_error_sink("Connection failed.");
+        {
+          show_error_sink("Connection failed.");
+        }
       break;
 
     case PA_CONTEXT_TERMINATED:
@@ -696,9 +738,13 @@ sink_connection_state_callback(pa_context* c, void* dmy)
     case PA_CONTEXT_FAILED:
 
       if (c == context_sink)
-        show_error_sink("Connection failed.");
+        {
+          show_error_sink("Connection failed.");
+        }
       else
-        show_error_source("Connection failed.");
+        {
+          show_error_source("Connection failed.");
+        }
       break;
 
     case PA_CONTEXT_TERMINATED:

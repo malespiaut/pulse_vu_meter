@@ -76,9 +76,13 @@ pulse_timer_handler()
   //----------------------
 
   for (int i = 99; i > 0; i--)
-    rchan[i] = rchan[i - 1];
+    {
+      rchan[i] = rchan[i - 1];
+    }
   for (int i = 99; i > 0; i--)
-    lchan[i] = lchan[i - 1];
+    {
+      lchan[i] = lchan[i - 1];
+    }
 
   rchan[0] = rUtil;
   lchan[0] = lUtil;
@@ -113,7 +117,9 @@ needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, i
   ver = ver + 1.0;
 
   if (t1 > M_PI)
-    t1 = M_PI;
+    {
+      t1 = M_PI;
+    }
 
   //------------------------------------------------------------------------------
   //	color is same as needle until past needle point and then color is gray
@@ -125,15 +131,25 @@ needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, i
     {
 
       if (cFlg == 0)
-        cairo_set_source_rgb(cr, 0.0, 0.0, 0.0); // black
+        {
+          cairo_set_source_rgb(cr, 0.0, 0.0, 0.0); // black
+        }
       else if (cFlg == 1)
-        cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+        {
+          cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+        }
       else if (cFlg == 2)
-        cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+        {
+          cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+        }
       else if (cFlg == 3)
-        cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+        {
+          cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+        }
       else if (cFlg == 4)
-        cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
+        {
+          cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
+        }
 
       cairo_set_line_width(cr, 2.5);
 
@@ -222,16 +238,26 @@ needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, i
           cairo_set_line_width(cr, 5.0);
 
           if (Max > M_PI)
-            Max = M_PI;
+            {
+              Max = M_PI;
+            }
 
           if (cFlg == 1)
-            cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+            {
+              cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+            }
           else if (cFlg == 2)
-            cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+            {
+              cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+            }
           else if (cFlg == 3)
-            cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+            {
+              cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+            }
           else if (cFlg == 4)
-            cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
+            {
+              cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
+            }
 
           cairo_arc(cr, hor, ver, len + 10, -M_PI, -M_PI + Max); // further point
           cairo_get_current_point(cr, &x, &y);
@@ -254,16 +280,26 @@ needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, i
           cairo_set_line_width(cr, 2.5);
 
           if (t2 > M_PI)
-            t2 = M_PI;
+            {
+              t2 = M_PI;
+            }
 
           if (cFlg == 1)
-            cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+            {
+              cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+            }
           else if (cFlg == 2)
-            cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+            {
+              cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+            }
           else if (cFlg == 3)
-            cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+            {
+              cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+            }
           else if (cFlg == 4)
-            cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
+            {
+              cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
+            }
 
           cairo_arc(cr, hor, ver, len + 10, -M_PI, -M_PI + t2); // further point
           cairo_get_current_point(cr, &x, &y);
@@ -285,15 +321,25 @@ needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, i
   cairo_set_line_width(cr, 2.5);
 
   if (cFlg == 0)
-    cairo_set_source_rgb(cr, 0.0, 0.0, 0.0); // black
+    {
+      cairo_set_source_rgb(cr, 0.0, 0.0, 0.0); // black
+    }
   else if (cFlg == 1)
-    cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+    {
+      cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+    }
   else if (cFlg == 2)
-    cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+    {
+      cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+    }
   else if (cFlg == 3)
-    cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+    {
+      cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+    }
   else if (cFlg == 4)
-    cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // black
+    {
+      cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // black
+    }
 
   cairo_set_line_width(cr, 3.5);
 
@@ -319,7 +365,9 @@ needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, i
   cairo_stroke(cr);
 
   if (legacy_vumeters)
-    return;
+    {
+      return;
+    }
 
   //--------------
   //	arcs
@@ -451,7 +499,9 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
   int noLine = 0;
 
   if (no_graph)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   if (style == NARROW_SPECTRUM || style == WIDE_SPECTRUM)
     {
@@ -488,18 +538,21 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
   else
     { // volume graph
       if (super_bars)
-        for (int i = 0; i < 100; i++)
-          { // scale and segregate data
-            slchan[i] = lchan[i] * SCALE_BASELINE_VOLUME;
-            srchan[i] = rchan[i] * SCALE_BASELINE_VOLUME;
-          }
-
+        {
+          for (int i = 0; i < 100; i++)
+            { // scale and segregate data
+              slchan[i] = lchan[i] * SCALE_BASELINE_VOLUME;
+              srchan[i] = rchan[i] * SCALE_BASELINE_VOLUME;
+            }
+        }
       else
-        for (int i = 0; i < 100; i++)
-          { // segregate data unscaled
-            slchan[i] = lchan[i];
-            srchan[i] = rchan[i];
-          }
+        {
+          for (int i = 0; i < 100; i++)
+            { // segregate data unscaled
+              slchan[i] = lchan[i];
+              srchan[i] = rchan[i];
+            }
+        }
     }
 
   //------------------------
@@ -573,24 +626,40 @@ color_bars(cairo_t* cr, int i, int noLine, int color)
 {
 
   if ((style == WIDE_SPECTRUM || style == NARROW_SPECTRUM) && !super_bars)
-    rand_colors = 1;
+    {
+      rand_colors = 1;
+    }
   else
-    rand_colors = 0;
+    {
+      rand_colors = 0;
+    }
 
   if (!rand_colors)
     {
       if (!noLine && srchan[i] > UPPER_MAX_MAX)
-        UPPER_MAX_MAX_COLOR
+        {
+          UPPER_MAX_MAX_COLOR
+        }
       else if (!noLine && srchan[i] > UPPER_MAX)
-        UPPER_MAX_COLOR
+        {
+          UPPER_MAX_COLOR
+        }
       else if (color == RED)
-        cairo_set_source_rgb(cr, 1.0, 0.1, 0.1); // red
+        {
+          cairo_set_source_rgb(cr, 1.0, 0.1, 0.1); // red
+        }
       else if (color == YELLOW)
-        cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+        {
+          cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+        }
       else if (color == WHITE)
-        cairo_set_source_rgb(cr, 1.0, 1.0, 1.0); // white
+        {
+          cairo_set_source_rgb(cr, 1.0, 1.0, 1.0); // white
+        }
       else
-        cairo_set_source_rgb(cr, 0.2, 0.2, 1.0); // blue
+        {
+          cairo_set_source_rgb(cr, 0.2, 0.2, 1.0); // blue
+        }
     }
 
   //--------------------------------------------------------------
@@ -604,13 +673,21 @@ color_bars(cairo_t* cr, int i, int noLine, int color)
       float g;
 
       if (i == 0)
-        g = 0.0;
+        {
+          g = 0.0;
+        }
       else if (i == 50)
-        g = 1.0;
+        {
+          g = 1.0;
+        }
       else if (i < 50)
-        g = (i % 50) / 50.0;
+        {
+          g = (i % 50) / 50.0;
+        }
       else
-        g = ((100 - i) % 50) / 50.0;
+        {
+          g = ((100 - i) % 50) / 50.0;
+        }
 
       g = g + r / (30.0 / i);
       r = r + b / (i / 40.0);
@@ -631,15 +708,23 @@ bar_graph(int lower, double chan[], int i, cairo_t* cr, int connect_graph, int d
 {
 
   if (chan[i] > G_LIM)
-    chan[i] = G_LIM;
+    {
+      chan[i] = G_LIM;
+    }
   if (chan[i + 1] > G_LIM)
-    chan[i + 1] = G_LIM;
+    {
+      chan[i + 1] = G_LIM;
+    }
 
   if (connect_graph)
-    connecting_lines(cr, lower, i, chan); // connecting horizontal graph lines
+    {
+      connecting_lines(cr, lower, i, chan); // connecting horizontal graph lines
+    }
 
   if (display_bars)
-    draw_bars_only(cr, lower, i, chan); // vertical bars
+    {
+      draw_bars_only(cr, lower, i, chan); // vertical bars
+    }
 }
 
 //-----------------------------
@@ -656,9 +741,13 @@ draw_bars_only(cairo_t* cr, int lower, int i, double chan[])
         { // centered
 
           if (lower)
-            cairo_move_to(cr, (double)((i * 4) + G_OFF), G_MAX + (double)chan[i]);
+            {
+              cairo_move_to(cr, (double)((i * 4) + G_OFF), G_MAX + (double)chan[i]);
+            }
           else
-            cairo_move_to(cr, (double)((i * 4) + G_OFF), G_MAX - (double)chan[i]);
+            {
+              cairo_move_to(cr, (double)((i * 4) + G_OFF), G_MAX - (double)chan[i]);
+            }
 
           cairo_line_to(cr, (double)((i * 4) + G_OFF), G_MAX); // baseline line
           cairo_stroke(cr);
@@ -733,7 +822,9 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
   int noLine = 0;
 
   if (no_meters)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
 #define MHOR 55.0
 
@@ -766,13 +857,16 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
     }
 
   else
-    L_Clipping = 0;
+    {
+      L_Clipping = 0;
+    }
 
   t1 = (Lx / 100.0) * M_PI;
 
   if (t1 < 0.1)
-    MaxLM = 0.0;
-
+    {
+      MaxLM = 0.0;
+    }
   else if (t1 > MaxLM)
     {
       MaxLM = t1;
@@ -781,19 +875,25 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
   else
     {
       if (MaxLM > 0.0)
-        MaxLM = MaxLM - MaxLM / DECAY_FACTOR;
+        {
+          MaxLM = MaxLM - MaxLM / DECAY_FACTOR;
+        }
     }
 
   //.............................
 
   MaxL[MLr++] = t1 * t1;
   if (MLr == RMX)
-    MLr = 0;
+    {
+      MLr = 0;
+    }
 
   double Avg = 0.0;
 
   for (int i = 0; i < RMX; i++)
-    Avg += MaxL[i];
+    {
+      Avg += MaxL[i];
+    }
 
   //------------------------------------------------------
   //	position of origin point and length of needle:
@@ -815,14 +915,22 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
     }
 
   if (legacy_vumeters)
-    cairo_move_to(cr, hor - 9.0, ver - 2.0); // top
+    {
+      cairo_move_to(cr, hor - 9.0, ver - 2.0); // top
+    }
   else
-    cairo_move_to(cr, hor - 10.0, ver + 15.0); // top
+    {
+      cairo_move_to(cr, hor - 10.0, ver + 15.0); // top
+    }
 
   if (L_Clipping)
-    cairo_show_text(cr, "Peak");
+    {
+      cairo_show_text(cr, "Peak");
+    }
   else
-    cairo_show_text(cr, "Left");
+    {
+      cairo_show_text(cr, "Left");
+    }
   cairo_stroke(cr);
 
   //--------------------------------
@@ -836,13 +944,16 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
     }
 
   else
-    R_Clipping = 0;
+    {
+      R_Clipping = 0;
+    }
 
   t1 = (Rx / 100.0) * M_PI;
 
   if (t1 < 0.1)
-    MaxRM = 0.;
-
+    {
+      MaxRM = 0.;
+    }
   else if (t1 > MaxRM)
     {
       MaxRM = t1;
@@ -850,17 +961,23 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
   else
     {
       if (MaxRM > 0.0)
-        MaxRM = MaxRM - MaxRM / DECAY_FACTOR;
+        {
+          MaxRM = MaxRM - MaxRM / DECAY_FACTOR;
+        }
     }
 
   MaxR[MRr++] = t1 * t1;
   if (MRr == RMX)
-    MRr = 0;
+    {
+      MRr = 0;
+    }
 
   Avg = 0.0;
 
   for (int i = 0; i < RMX; i++)
-    Avg += MaxR[i];
+    {
+      Avg += MaxR[i];
+    }
 
   if (legacy_vumeters)
     {
@@ -874,14 +991,22 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
     }
 
   if (legacy_vumeters)
-    cairo_move_to(cr, hor - 12.0, ver - 2.0); // top
+    {
+      cairo_move_to(cr, hor - 12.0, ver - 2.0); // top
+    }
   else
-    cairo_move_to(cr, hor - 14.0, ver + 15.0); // top
+    {
+      cairo_move_to(cr, hor - 14.0, ver + 15.0); // top
+    }
 
   if (R_Clipping)
-    cairo_show_text(cr, "Peak");
+    {
+      cairo_show_text(cr, "Peak");
+    }
   else
-    cairo_show_text(cr, "Right");
+    {
+      cairo_show_text(cr, "Right");
+    }
   cairo_stroke(cr);
 
   //----------------------------------------------------------
@@ -891,13 +1016,16 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
   MRx = MLx = 0.0; // start a new sample - this one has been used.
 
   if (ML > CLIP_LEVEL)
-    ML = 99.0; // limit
+    {
+      ML = 99.0; // limit
+    }
 
   t1 = (ML / 100.0) * M_PI; // fraction of PI
 
   if (t1 < 0.1)
-    MaxMM = 0.;
-
+    {
+      MaxMM = 0.;
+    }
   else if (t1 > MaxMM)
     {
       MaxMM = t1;
@@ -905,17 +1033,23 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
   else
     {
       if (MaxMM > 0.0)
-        MaxMM = MaxMM - MaxMM / DECAY_FACTOR;
+        {
+          MaxMM = MaxMM - MaxMM / DECAY_FACTOR;
+        }
     }
 
   MaxM[MMr++] = t1 * t1;
   if (MMr == RMX)
-    MMr = 0;
+    {
+      MMr = 0;
+    }
 
   Avg = 0.0;
 
   for (int i = 0; i < RMX; i++)
-    Avg += MaxM[i];
+    {
+      Avg += MaxM[i];
+    }
 
   if (legacy_vumeters)
     {
@@ -929,9 +1063,13 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
     }
 
   if (legacy_vumeters)
-    cairo_move_to(cr, hor - 30.0, ver - 2.0); // top
+    {
+      cairo_move_to(cr, hor - 30.0, ver - 2.0); // top
+    }
   else
-    cairo_move_to(cr, hor - 30.0, ver + 15.0); // top
+    {
+      cairo_move_to(cr, hor - 30.0, ver + 15.0); // top
+    }
 
   cairo_show_text(cr, "Microphone");
   cairo_stroke(cr);
@@ -941,7 +1079,9 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
   //--------------------------
 
   if (legacy_vumeters)
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   hor = MHOR + 90;
   len = 30.0;
@@ -949,9 +1089,13 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
   Balance = 50.0 + 2.0 * (Rx - Lx); // difference & double the effect
 
   if (Balance > 99.0)
-    Balance = 99.0;
+    {
+      Balance = 99.0;
+    }
   if (Balance < 0.0)
-    Balance = 0.0;
+    {
+      Balance = 0.0;
+    }
   t1 = (Balance / 100.0) * M_PI;
 
   needles(cr, hor, ver, len, t1, 0, 4, 0.0);
@@ -1029,8 +1173,9 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
   cairo_set_line_width(cr, LINE_WIDTH);
 
   if (ML < 95.0)
-    cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
-
+    {
+      cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+    }
   else
     { // clipping
 
@@ -1081,14 +1226,20 @@ fftTobars(fftw_complex* fft, int size, int* bars)
       i++;
 
       if (strength < 1.00e-10)
-        strength = 1.00e-10; // prevent overflows.
+        {
+          strength = 1.00e-10; // prevent overflows.
+        }
 
       amplitude = (maxHeight + (int)(10.0 * log10(strength))) * 2.0;
 
       if (amplitude > maxHeight)
-        amplitude = maxHeight;
+        {
+          amplitude = maxHeight;
+        }
       if (amplitude < 0)
-        amplitude = 0;
+        {
+          amplitude = 0;
+        }
 
       bars[bar] = amplitude;
 
@@ -1143,7 +1294,9 @@ spectrum()
   //	for (int i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2]; // every other element
 
   for (int i = 0; i < size; i++)
-    in[i] = Hann[i] * exchangeBuf[i * 2]; // every other element
+    {
+      in[i] = Hann[i] * exchangeBuf[i * 2]; // every other element
+    }
 
   //	for(int i = 0; i < size; i++) in[i] = Hann[i] * buffer[i];
 
@@ -1156,7 +1309,9 @@ spectrum()
   for (int i = 0; i < width / 2; i++)
     {
       if (barsL[i] < 0.0)
-        slchan[i] = 0.0;
+        {
+          slchan[i] = 0.0;
+        }
       else
         {
           if (super_bars)
@@ -1172,7 +1327,9 @@ spectrum()
               slchan[i] = barsL[i] * SCALE_MIDLINE_SPECTRUM;
             }
           if (slchan[i] > SPECTRUM_PEAK)
-            slchan[i] = SPECTRUM_PEAK;
+            {
+              slchan[i] = SPECTRUM_PEAK;
+            }
           //			else if (slchan[i] < 0.0) slchan[i] = 0.0;
         }
     }
@@ -1184,7 +1341,9 @@ spectrum()
   //	for (int i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2 + 1]; // every other element
 
   for (int i = 0; i < size; i++)
-    in[i] = Hann[i] * exchangeBuf[i * 2 + 1]; // every other element
+    {
+      in[i] = Hann[i] * exchangeBuf[i * 2 + 1]; // every other element
+    }
 
   //	for(int i = 0; i < size; i++) in[i] = Hann[i] * buffer[i];
 
@@ -1195,7 +1354,9 @@ spectrum()
   for (int i = 0; i < width / 2; i++)
     {
       if (barsR[i] < 0.0)
-        srchan[i] = 0.0;
+        {
+          srchan[i] = 0.0;
+        }
       else
         {
           if (super_bars)
@@ -1211,7 +1372,9 @@ spectrum()
               srchan[i] = barsR[i] * SCALE_MIDLINE_SPECTRUM;
             }
           if (srchan[i] > SPECTRUM_PEAK)
-            srchan[i] = SPECTRUM_PEAK;
+            {
+              srchan[i] = SPECTRUM_PEAK;
+            }
           //			else if (srchan[i] < 0.0) srchan[i] = 0.0;
         }
     }
