@@ -54,6 +54,7 @@
 #include "functions.h"
 
 #include "global-variables.h"
+#include "global-extern-variables.h"
 
 int main(int argc, char *argv[]) {
 

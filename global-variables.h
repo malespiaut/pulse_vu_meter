@@ -27,8 +27,6 @@
 
 // August 20, 2021
 
-int	display_bars;
-
 pa_glib_mainloop        *m_sink;        // internal audio - sink
 pa_glib_mainloop        *m_source;      // pulse audio microphone - source
 
