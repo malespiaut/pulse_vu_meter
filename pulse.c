@@ -122,7 +122,7 @@ stream_read_callback_sink(pa_stream* s, size_t l, void* dmy)
 
   if (samples > SAMPLE_SIZE)
     { // for spectrum analysis
-      for (int i = 0; i < SAMPLE_SIZE; i++)
+      for (size_t i = 0; i < SAMPLE_SIZE; i++)
         {
           exchangeBuf[i] = audio_data[i];
         }
@@ -131,8 +131,7 @@ stream_read_callback_sink(pa_stream* s, size_t l, void* dmy)
 
   while (samples >= nchan)
     {
-      unsigned c;
-      for (c = 0; c < nchan; c++)
+      for (size_t c = 0; c < nchan; c++)
         {
           float v = fabs(audio_data[c]);
           if (v > levels[c])
@@ -192,8 +191,7 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
 
   while (samples >= nchan)
     {
-      unsigned c;
-      for (c = 0; c < nchan; c++)
+      for (size_t c = 0; c < nchan; c++)
         {
           float v = fabs(pcm[c]);
           if (v > levels[c])
@@ -492,7 +490,7 @@ source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void*
 
   if (si->n_ports > 0)
     {
-      for (int i = 0; i < si->n_ports; i++)
+      for (size_t i = 0; i < si->n_ports; i++)
         {
           printf("+++ pa_source_port_info name %d: %s\n", i, si->ports[i]->name);
           printf("+++ pa_source_port_info priority %d: %d\n", i, si->ports[i]->priority);

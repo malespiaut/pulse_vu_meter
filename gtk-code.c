@@ -75,11 +75,11 @@ pulse_timer_handler()
   //	shift the data
   //----------------------
 
-  for (int i = 99; i > 0; i--)
+  for (size_t i = 99; i > 0; i--)
     {
       rchan[i] = rchan[i - 1];
     }
-  for (int i = 99; i > 0; i--)
+  for (size_t i = 99; i > 0; i--)
     {
       lchan[i] = lchan[i - 1];
     }
@@ -157,7 +157,7 @@ needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, i
       //	draw all short and long hash marks
       //--------------------------------------------
 
-      for (int i = 0; i < 21; i++)
+      for (size_t i = 0; i < 21; i++)
         {
 
           //-------------------------------
@@ -512,7 +512,7 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
 
       double blchan[100], brchan[100];
 
-      for (int i = 0; i < 100; i++)
+      for (size_t i = 0; i < 100; i++)
         {
           blchan[i] = slchan[i];
           brchan[i] = srchan[i];
@@ -523,7 +523,7 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
 
       double F;
 
-      for (int i = 0; i < 99; i++)
+      for (size_t i = 0; i < 99; i++)
         { // make bars less jumpy
 
           slchan[i] = (slchan[i] + blchan[i]) / 2.0; // left
@@ -539,7 +539,7 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
     { // volume graph
       if (super_bars)
         {
-          for (int i = 0; i < 100; i++)
+          for (size_t i = 0; i < 100; i++)
             { // scale and segregate data
               slchan[i] = lchan[i] * SCALE_BASELINE_VOLUME;
               srchan[i] = rchan[i] * SCALE_BASELINE_VOLUME;
@@ -547,7 +547,7 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
         }
       else
         {
-          for (int i = 0; i < 100; i++)
+          for (size_t i = 0; i < 100; i++)
             { // segregate data unscaled
               slchan[i] = lchan[i];
               srchan[i] = rchan[i];
@@ -561,7 +561,7 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
 
   cairo_set_line_width(cr, BAR_WIDTH1);
 
-  for (int i = 0; i < 99; i++)
+  for (size_t i = 0; i < 99; i++)
     { // draw graph
 
       if ((!connect_graph || display_bars) && super_bars)
@@ -890,7 +890,7 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
 
   double Avg = 0.0;
 
-  for (int i = 0; i < RMX; i++)
+  for (size_t i = 0; i < RMX; i++)
     {
       Avg += MaxL[i];
     }
@@ -974,7 +974,7 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
 
   Avg = 0.0;
 
-  for (int i = 0; i < RMX; i++)
+  for (size_t i = 0; i < RMX; i++)
     {
       Avg += MaxR[i];
     }
@@ -1046,7 +1046,7 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
 
   Avg = 0.0;
 
-  for (int i = 0; i < RMX; i++)
+  for (size_t i = 0; i < RMX; i++)
     {
       Avg += MaxM[i];
     }
@@ -1211,13 +1211,13 @@ fftTobars(fftw_complex* fft, int size, int* bars)
 {
 
   double strength, real, imagin, scale;
-  int amplitude, i, j, bar, incr;
+  int amplitude, i, j, incr;
 
   scale = 0.0003;
 
   i = 0; // fft index
 
-  for (bar = 0; bar < numBars; bar++)
+  for (size_t bar = 0; bar < numBars; bar++)
     { // average for each bar
 
       real = fft[i][0] * scale;
@@ -1274,7 +1274,7 @@ spectrum()
 
       Hann = (float*)malloc(sizeof(float) * size);
 
-      for (int n = 0; n < size; n++)
+      for (size_t n = 0; n < size; n++)
         {
           Hann[n] = 0.5 * (1.0 - cos(2.0 * M_PI * n / (size - 1.0)));
         }
@@ -1291,9 +1291,9 @@ spectrum()
   //	left channel
   //	------------
 
-  //	for (int i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2]; // every other element
+  //	for (size_t i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2]; // every other element
 
-  for (int i = 0; i < size; i++)
+  for (size_t i = 0; i < size; i++)
     {
       in[i] = Hann[i] * exchangeBuf[i * 2]; // every other element
     }
@@ -1306,7 +1306,7 @@ spectrum()
 
   double F = 1.0;
 
-  for (int i = 0; i < width / 2; i++)
+  for (size_t i = 0; i < width / 2; i++)
     {
       if (barsL[i] < 0.0)
         {
@@ -1338,9 +1338,9 @@ spectrum()
   //	right channel
   //	-------------
 
-  //	for (int i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2 + 1]; // every other element
+  //	for (size_t i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2 + 1]; // every other element
 
-  for (int i = 0; i < size; i++)
+  for (size_t i = 0; i < size; i++)
     {
       in[i] = Hann[i] * exchangeBuf[i * 2 + 1]; // every other element
     }
@@ -1351,7 +1351,7 @@ spectrum()
   fftTobars(out, size, barsR);
 
   F = 1.0;
-  for (int i = 0; i < width / 2; i++)
+  for (size_t i = 0; i < width / 2; i++)
     {
       if (barsR[i] < 0.0)
         {
