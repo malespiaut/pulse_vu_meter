@@ -60,12 +60,6 @@ gboolean
 pulse_timer_handler()
 { // check pulse every 100 millisecs
 
-  static int rx = 0;
-  double ra = 0.0;
-
-  static int lx = 0;
-  double la = 0.0;
-
   rUtil = log10(RightChan + 1) * FACTOR;
   lUtil = log10(LeftChan + 1) * FACTOR;
 
@@ -111,7 +105,7 @@ void
 needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, int cFlg, double Max)
 {
 
-  double x, x1, x2, y, y1, y2;
+  double x, x1, y, y1;
   double X = 0.0;
 
   ver = ver + 1.0;
@@ -521,8 +515,6 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
       spectrum(); // scaling is done in spectrum()
       noLine = 1;
 
-      double F;
-
       for (size_t i = 0; i < 99; i++)
         { // make bars less jumpy
 
@@ -818,8 +810,6 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
 {
 
   double hor, ver, t1, len;
-
-  int noLine = 0;
 
   if (no_meters)
     {
@@ -1211,7 +1201,7 @@ fftTobars(fftw_complex* fft, int size, int* bars)
 {
 
   double strength, real, imagin, scale;
-  int amplitude, i, j, incr;
+  int amplitude, i;
 
   scale = 0.0003;
 
@@ -1262,7 +1252,6 @@ spectrum()
   int size = SAMPLE_SIZE / 2;
 
   static float* Hann = NULL;
-  float buffer[sampSpec.channels * size];
   static double* in = NULL;
   static fftw_complex* out = NULL;
 
