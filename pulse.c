@@ -92,8 +92,9 @@ show_error_source(const char* txt)
 //-----------------------------
 
 void
-stream_read_callback_sink(pa_stream* s, size_t l, void* dmy)
+stream_read_callback_sink(pa_stream* s, size_t l, void* dummy)
 {
+  (void)dummy;
 
   const void* p;
 
@@ -156,7 +157,7 @@ stream_read_callback_sink(pa_stream* s, size_t l, void* dmy)
 void
 stream_read_callback_source(pa_stream* s, size_t len, void* user)
 {
-
+  (void)user;
   const void* p;
 
   if (no_microphone)
@@ -230,8 +231,9 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
 //-----------------
 
 void
-stream_state_callback_sink(pa_stream* s, void* dmy)
+stream_state_callback_sink(pa_stream* s, void* dummy)
 {
+  (void)dummy;
 
   switch (pa_stream_get_state(s))
     {
@@ -263,8 +265,9 @@ stream_state_callback_sink(pa_stream* s, void* dmy)
 //---------------
 
 void
-stream_state_callback_source(pa_stream* s, void* dmy)
+stream_state_callback_source(pa_stream* s, void* dummy)
 {
+  (void)dummy;
 
   switch (pa_stream_get_state(s))
     {
@@ -299,7 +302,7 @@ void
 sink_create_stream(const char* name, const char* description,
                    const pa_sample_spec sampSpec, const pa_channel_map cmap)
 {
-
+  (void)description;
   // PLAY
 
   char txt[256];
@@ -379,7 +382,7 @@ void
 source_create_stream(const char* name, const char* description,
                      const pa_sample_spec sampSpec, const pa_channel_map cmap)
 {
-
+  (void)description;
   // MIKE
 
   char txt[256];
@@ -446,8 +449,9 @@ source_create_stream(const char* name, const char* description,
 //--------------------------------------------------
 
 void
-source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void* dmy)
+source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void* dummy)
 {
+  (void)dummy;
 
   if (is_last < 0)
     {
@@ -503,9 +507,9 @@ source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void*
 //--------------------------------------------------
 
 void
-sink_info_callback(pa_context* p, const pa_sink_info* si, int is_last, void* dmy)
+sink_info_callback(pa_context* p, const pa_sink_info* si, int is_last, void* dummy)
 {
-
+  (void)dummy;
   // PLAYBACK
 
   if (is_last < 0)
@@ -534,9 +538,9 @@ sink_info_callback(pa_context* p, const pa_sink_info* si, int is_last, void* dmy
 }
 
 void
-sink_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy)
+sink_server_info_callback(pa_context* c, const pa_server_info* si, void* dummy)
 {
-
+  (void)dummy;
   // PLAYBACK
 
   pa_operation* p1;
@@ -576,8 +580,9 @@ sink_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy)
 }
 
 void
-source_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy)
+source_server_info_callback(pa_context* c, const pa_server_info* si, void* dummy)
 {
+  (void)dummy;
 
   pa_operation* p1;
 
@@ -643,7 +648,7 @@ source_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy)
 }
 
 void
-source_connection_state_callback(pa_context* c, void* dmy)
+source_connection_state_callback(pa_context* c, void* dummy)
 {
 
   pa_operation* p1;
@@ -669,7 +674,7 @@ source_connection_state_callback(pa_context* c, void* dmy)
 
     case PA_CONTEXT_READY:
 
-      p1 = pa_context_get_server_info(c, source_server_info_callback, dmy);
+      p1 = pa_context_get_server_info(c, source_server_info_callback, dummy);
       pa_operation_unref(p1);
       break;
 
@@ -690,8 +695,9 @@ source_connection_state_callback(pa_context* c, void* dmy)
 }
 
 void
-sink_connection_state_callback(pa_context* c, void* dmy)
+sink_connection_state_callback(pa_context* c, void* dummy)
 {
+  (void)dummy;
 
   pa_operation* p1;
 

@@ -46,39 +46,23 @@
 #include <sys/ipc.h>
 #include <unistd.h>
 
-void show_error_sink(const char* txt);
+void on_destroy(void);
+void show_error_sink(const char*);
+void show_error_source(const char*);
+void sink_connection_state_callback(pa_context*, void*);
+void sink_create_stream(const char*, const char*, const pa_sample_spec, const pa_channel_map);
+void sink_info_callback(pa_context*, const pa_sink_info*, int, void*);
+void sink_server_info_callback(pa_context*, const pa_server_info*, void*);
+void source_connection_state_callback(pa_context*, void*);
+void source_create_stream(const char*, const char*, const pa_sample_spec, const pa_channel_map);
+void source_info_callback(pa_context*, const pa_source_info*, int, void*);
+void source_server_info_callback(pa_context*, const pa_server_info*, void*);
+void spectrum(void);
+void stream_read_callback_sink(pa_stream*, size_t, void*);
+void stream_read_callback_source(pa_stream*, size_t, void*);
+void stream_state_callback_source(pa_stream*, void*);
 
-void show_error_source(const char* txt);
-
-void stream_read_callback_sink(pa_stream* s, size_t l, void* dmy);
-
-void stream_read_callback_source(pa_stream* s, size_t len, void* user);
-
-void stream_state_callback_source(pa_stream* s, void* dmy);
-
-void sink_create_stream(const char* name, const char* description,
-                        const pa_sample_spec sampSpec, const pa_channel_map cmap);
-
-void source_create_stream(const char* name, const char* description,
-                          const pa_sample_spec sampSpec, const pa_channel_map cmap);
-
-void source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void* dmy);
-
-void sink_info_callback(pa_context* p, const pa_sink_info* si, int is_last, void* dmy);
-
-void sink_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy);
-
-void source_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy);
-
-void source_connection_state_callback(pa_context* c, void* dmy);
-
-void sink_connection_state_callback(pa_context* c, void* dmy);
-
-void on_destroy();
-
-void spectrum();
-
-gboolean pulse_timer_handler();
+gboolean pulse_timer_handler(void);
 
 #define SAMPLE_SIZE 400
 #define PULSE_TIME 100 // granualrity of pulse calls - see sink.h
@@ -95,8 +79,8 @@ gboolean pulse_timer_handler();
 
 #define CLIP_LEVEL 103.0
 
-char* sink_name();
-char* source_name();
+char* sink_name(void);
+char* source_name(void);
 
 #define PULSE_SINK_NAME sink_name()
 #define PULSE_SOURCE_NAME source_name()
