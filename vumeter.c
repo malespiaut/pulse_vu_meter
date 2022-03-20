@@ -194,7 +194,7 @@ main(int argc, char* argv[])
         case 'g':
           no_meters = 1;
           gtk_widget_hide(draw2);
-          gtk_window_resize(window, 20, 20);
+          gtk_window_resize(GTK_WINDOW(window), 20, 20);
           strcpy(cmd, "Spark Gap Radio Engineering Dept Spectrum 2.00");
           gtk_window_set_title(GTK_WINDOW(window), cmd);
           break;
@@ -209,7 +209,7 @@ main(int argc, char* argv[])
             fixed1,
             draw2,
             1, 20);
-          gtk_window_resize(window, 20, 20);
+          gtk_window_resize(GTK_WINDOW(window), 20, 20);
           strcpy(cmd, "Spark Gap Radio Engineering Dept VU Meters 2.00");
           gtk_window_set_title(GTK_WINDOW(window), cmd);
           break;
@@ -231,7 +231,7 @@ main(int argc, char* argv[])
             draw2,
             1, 20);
           gtk_widget_set_size_request(draw2, 580, 74);
-          gtk_window_resize(window, 20, 20);
+          gtk_window_resize(GTK_WINDOW(window), 20, 20);
           strcpy(cmd, "Spark Gap Radio Engineering Dept VU Meters 2.00");
           gtk_window_set_title(GTK_WINDOW(window), cmd);
           break;
@@ -265,7 +265,7 @@ main(int argc, char* argv[])
       gtk_widget_hide(vumeter1);
       gtk_widget_hide(vumeter2);
       gtk_widget_hide(vumeter3);
-      gtk_window_resize(window, 20, 20);
+      gtk_window_resize(GTK_WINDOW(window), 20, 20);
     }
 
 #include "sink.h"
