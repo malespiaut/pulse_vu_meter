@@ -31,46 +31,62 @@
 #include <config.h>
 #endif
 
+#include <ctype.h>
+#include <errno.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <unistd.h>
 #include <string.h>
-#include <errno.h>
+#include <sys/types.h>
 #include <time.h>
-#include <ctype.h>
+#include <unistd.h>
 
 #include "functions.h"
 
 #include "global-extern-variables.h"
 
-char *  sink_name() { static char x[32]; sprintf(x,"sink%d", getpid()); return x; }
-char *  source_name() { static char x[32]; sprintf(x,"source%d", getpid()); return x; }
+char*
+sink_name()
+{
+  static char x[32];
+  sprintf(x, "sink%d", getpid());
+  return x;
+}
+char*
+source_name()
+{
+  static char x[32];
+  sprintf(x, "source%d", getpid());
+  return x;
+}
 
-static	const pa_sample_spec sampSpec = {
-        .format = PA_SAMPLE_FLOAT32LE,
-        .rate = 44100,
-        .channels = 2
-        };
+static const pa_sample_spec sampSpec = {
+  .format = PA_SAMPLE_FLOAT32LE,
+  .rate = 44100,
+  .channels = 2};
 
-void    on_destroy() {
-	        pa_glib_mainloop_free(m_sink);
-        	pa_glib_mainloop_free(m_source);
-                gtk_main_quit();
-                }
+void
+on_destroy()
+{
+  pa_glib_mainloop_free(m_sink);
+  pa_glib_mainloop_free(m_source);
+  gtk_main_quit();
+}
 
-void	show_error_sink(const char *txt ) {
-	printf("%s: %s", txt, pa_strerror(pa_context_errno(context_sink)));
-	on_destroy();
-	}
+void
+show_error_sink(const char* txt)
+{
+  printf("%s: %s", txt, pa_strerror(pa_context_errno(context_sink)));
+  on_destroy();
+}
 
-void	show_error_source(const char *txt ) {
-	printf("%s: %s", txt, pa_strerror(pa_context_errno(context_source)));
-	on_destroy();
-	}
+void
+show_error_source(const char* txt)
+{
+  printf("%s: %s", txt, pa_strerror(pa_context_errno(context_source)));
+  on_destroy();
+}
 
 //----------------------------------------
 //	internal channel callbacks
@@ -80,99 +96,122 @@ void	show_error_source(const char *txt ) {
 //	Player callback
 //-----------------------------
 
-void	stream_read_callback_sink(pa_stream *s, size_t l, void *dmy) {
+void
+stream_read_callback_sink(pa_stream* s, size_t l, void* dmy)
+{
 
-        const void *p;
-        static int count = 0;
+  const void* p;
+  static int count = 0;
 
-        if (pa_stream_peek(s, &p, &l) < 0) {
-                g_message("pa_stream_peek() failed: %s", pa_strerror(pa_context_errno(context_sink)));
-                return;
-                }
+  if (pa_stream_peek(s, &p, &l) < 0)
+    {
+      g_message("pa_stream_peek() failed: %s", pa_strerror(pa_context_errno(context_sink)));
+      return;
+    }
 
-        float *audio_data = (float *) p;
-        int samples = l/sizeof(float);
-        int nchan = sink_channels;
-        float levels[2] = {0.0};
+  float* audio_data = (float*)p;
+  int samples = l / sizeof(float);
+  int nchan = sink_channels;
+  float levels[2] = {0.0};
 
-        if (samples < 2 ) {
-                pa_stream_drop(s);
-                return;
-                }
+  if (samples < 2)
+    {
+      pa_stream_drop(s);
+      return;
+    }
 
-        if (samples > SAMPLE_SIZE ) { // for spectrum analysis
-                for (int i=0; i < SAMPLE_SIZE; i++) { exchangeBuf[i] = audio_data[i];  }
-                exchange = 1;
-                }
+  if (samples > SAMPLE_SIZE)
+    { // for spectrum analysis
+      for (int i = 0; i < SAMPLE_SIZE; i++)
+        {
+          exchangeBuf[i] = audio_data[i];
+        }
+      exchange = 1;
+    }
 
-        while (samples >= nchan) {
-                unsigned c;
-                for (c = 0; c < nchan; c++) {
-                float v = fabs(audio_data[c]);
-                if (v > levels[c])
-                        levels[c] = v;
-                        }
-                audio_data += nchan;
-                samples -= nchan;
-                }
+  while (samples >= nchan)
+    {
+      unsigned c;
+      for (c = 0; c < nchan; c++)
+        {
+          float v = fabs(audio_data[c]);
+          if (v > levels[c])
+            levels[c] = v;
+        }
+      audio_data += nchan;
+      samples -= nchan;
+    }
 
-        if (LeftChan < levels[0]) LeftChan = levels[0];
-        if (RightChan < levels[1]) RightChan = levels[1];
+  if (LeftChan < levels[0])
+    LeftChan = levels[0];
+  if (RightChan < levels[1])
+    RightChan = levels[1];
 
-        pa_stream_drop(s);
-
-	}
+  pa_stream_drop(s);
+}
 
 //--------------------------------------
 //      Microphone channel callback
 //--------------------------------------
 
-void	stream_read_callback_source(pa_stream *s, size_t len, void *user) {
+void
+stream_read_callback_source(pa_stream* s, size_t len, void* user)
+{
 
-        const void *p;
-        static int count = 0;
-        static float inData[5];
+  const void* p;
+  static int count = 0;
+  static float inData[5];
 
-        if (no_microphone) pa_stream_drop(s);
+  if (no_microphone)
+    pa_stream_drop(s);
 
-        if (pa_stream_peek(s, &p, &len) < 0) {
-                g_message("pa_stream_peek() failed: %s", pa_strerror(pa_context_errno(context_source)));
-                return;
-                }
+  if (pa_stream_peek(s, &p, &len) < 0)
+    {
+      g_message("pa_stream_peek() failed: %s", pa_strerror(pa_context_errno(context_source)));
+      return;
+    }
 
-        float *pcm = (float *) p;
-        int samples = len / sizeof(float);
-        int nchan = source_channels;
-        float levels[2] = {0.0};
+  float* pcm = (float*)p;
+  int samples = len / sizeof(float);
+  int nchan = source_channels;
+  float levels[2] = {0.0};
 
-        if (samples < 2 ) {
-                pa_stream_drop(s);
-                return;
-                }
+  if (samples < 2)
+    {
+      pa_stream_drop(s);
+      return;
+    }
 
-        while (samples >= nchan) {
-                unsigned c;
-                for (c = 0; c < nchan; c++) {
-                float v = fabs(pcm[c]);
-                if (v > levels[c])
-                        levels[c] = v;
-                        }
-                pcm += nchan;
-                samples -= nchan;
-                }
-
-        if (MLx < levels[0]) MLx = levels[0];
-        if (MRx < levels[0]) MRx = levels[1];
-
-	ML = MLx; MR = MRx;	
-
-        if (nchan == 2 ) ML = (ML + MR) / 2;	// average
-	else MR = ML; // mono
-
-        ML = log10(ML + 1) * (FACTOR - 20.0);
-
-        pa_stream_drop(s);
+  while (samples >= nchan)
+    {
+      unsigned c;
+      for (c = 0; c < nchan; c++)
+        {
+          float v = fabs(pcm[c]);
+          if (v > levels[c])
+            levels[c] = v;
         }
+      pcm += nchan;
+      samples -= nchan;
+    }
+
+  if (MLx < levels[0])
+    MLx = levels[0];
+  if (MRx < levels[0])
+    MRx = levels[1];
+
+  ML = MLx;
+  MR = MRx;
+
+  if (nchan == 2)
+    ML = (ML + MR) / 2; // average
+  else
+    MR = ML; // mono
+
+  ML = log10(ML + 1) * (FACTOR - 20.0);
+
+  pa_stream_drop(s);
+}
 
 //------------------------------------------------
 //	stream state callback to receive messages
@@ -182,471 +221,490 @@ void	stream_read_callback_source(pa_stream *s, size_t len, void *user) {
 //	Sink
 //-----------------
 
-void	stream_state_callback_sink(pa_stream *s, void *dmy) {
+void
+stream_state_callback_sink(pa_stream* s, void* dmy)
+{
 
-	switch (pa_stream_get_state(s)) {
+  switch (pa_stream_get_state(s))
+    {
 
-		case PA_STREAM_UNCONNECTED:
-		case PA_STREAM_CREATING:
+    case PA_STREAM_UNCONNECTED:
+    case PA_STREAM_CREATING:
 
-			break;
+      break;
 
-		case PA_STREAM_READY:
+    case PA_STREAM_READY:
 
-			break;
-            
-		case PA_STREAM_FAILED:
+      break;
 
-			show_error_sink("Connection failed");
-			break;
-            
-		case PA_STREAM_TERMINATED:
+    case PA_STREAM_FAILED:
 
-			pa_context_disconnect(context_sink);
-			pa_stream_unref(stream_sink);
-			on_destroy();
+      show_error_sink("Connection failed");
+      break;
 
-		}
-	}
+    case PA_STREAM_TERMINATED:
+
+      pa_context_disconnect(context_sink);
+      pa_stream_unref(stream_sink);
+      on_destroy();
+    }
+}
 
 //---------------
 //	Source
 //---------------
 
-void	stream_state_callback_source(pa_stream *s, void *dmy) {
+void
+stream_state_callback_source(pa_stream* s, void* dmy)
+{
 
-	switch (pa_stream_get_state(s)) {
+  switch (pa_stream_get_state(s))
+    {
 
-		case PA_STREAM_UNCONNECTED:
-		case PA_STREAM_CREATING:
+    case PA_STREAM_UNCONNECTED:
+    case PA_STREAM_CREATING:
 
-			break;
+      break;
 
-		case PA_STREAM_READY:
+    case PA_STREAM_READY:
 
-			break;
-            
-		case PA_STREAM_FAILED:
+      break;
 
-			show_error_source("Connection failed");
-			break;
-            
-		case PA_STREAM_TERMINATED:
+    case PA_STREAM_FAILED:
 
-			pa_context_disconnect(context_source);
-			pa_stream_unref(stream_source);
-			on_destroy();
+      show_error_source("Connection failed");
+      break;
 
-		}
-	}
+    case PA_STREAM_TERMINATED:
+
+      pa_context_disconnect(context_source);
+      pa_stream_unref(stream_source);
+      on_destroy();
+    }
+}
 
 //---------------------------------------------
 //	stream create - used for all channels
 //---------------------------------------------
 
-void	sink_create_stream(const char *name, const char *description, 
-		const pa_sample_spec sampSpec, const pa_channel_map cmap) {
+void
+sink_create_stream(const char* name, const char* description,
+                   const pa_sample_spec sampSpec, const pa_channel_map cmap)
+{
 
-// PLAY
+  // PLAY
 
-	char txt[256];
-	pa_sample_spec nss;
+  char txt[256];
+  pa_sample_spec nss;
 
-/*------------------------------------------------------------------------------------
-pa_buffer_attr
-  maxlength = -1;	// Maximum length of the buffer in bytes. 
-  tlength = -1;		// Playback only: target length of the buffer. 
-  prebuf = -1;		// Playback only: pre-buffering. 
-  minreq = -1;		// Playback only: minimum request.
-  fragsize = -1;	// Recording only: server sends data in fragsize block
----------------------------------------------------------------------------------------*/
+  /*------------------------------------------------------------------------------------
+  pa_buffer_attr
+    maxlength = -1;	// Maximum length of the buffer in bytes.
+    tlength = -1;		// Playback only: target length of the buffer.
+    prebuf = -1;		// Playback only: pre-buffering.
+    minreq = -1;		// Playback only: minimum request.
+    fragsize = -1;	// Recording only: server sends data in fragsize block
+  ---------------------------------------------------------------------------------------*/
 
-//-------------------------------------
-//	stream device (channel) name
-//-------------------------------------
+  //-------------------------------------
+  //	stream device (channel) name
+  //-------------------------------------
 
-	g_free(device_name_sink);
-	device_name_sink = g_strdup(device_name_sink);
+  g_free(device_name_sink);
+  device_name_sink = g_strdup(device_name_sink);
 
-	g_free(device_description_sink);
-	device_description_sink = g_strdup(device_description_sink);
-    
-	nss.format = PA_SAMPLE_FLOAT32;
-	nss.rate = sampSpec.rate;
-	nss.channels = sampSpec.channels; // check your mic - mono or stereo?
-    
-	printf("\nPlayback Sample format for device %s:\n\t%s\n", 
-		device_name_sink, pa_sample_spec_snprint(txt, sizeof(txt), &nss));
+  g_free(device_description_sink);
+  device_description_sink = g_strdup(device_description_sink);
 
-	printf("Playback Create stream Channel map for device %s:\n\t%s\n", 
-		device_name_sink, pa_channel_map_snprint(txt, sizeof(txt), &cmap));
+  nss.format = PA_SAMPLE_FLOAT32;
+  nss.rate = sampSpec.rate;
+  nss.channels = sampSpec.channels; // check your mic - mono or stereo?
 
-//-------------------------------------------------------------------------
-//	establish callbacks and connection for internal players (sinks)
-//-------------------------------------------------------------------------
+  printf("\nPlayback Sample format for device %s:\n\t%s\n",
+         device_name_sink, pa_sample_spec_snprint(txt, sizeof(txt), &nss));
 
-	stream_sink = pa_stream_new(context_sink, PULSE_SINK_NAME, &nss, &cmap);
+  printf("Playback Create stream Channel map for device %s:\n\t%s\n",
+         device_name_sink, pa_channel_map_snprint(txt, sizeof(txt), &cmap));
 
-//------------------------------------------------------------------
-//	establish function to be called for status report
-//------------------------------------------------------------------
+  //-------------------------------------------------------------------------
+  //	establish callbacks and connection for internal players (sinks)
+  //-------------------------------------------------------------------------
 
-	pa_stream_set_state_callback(stream_sink, stream_state_callback_sink, NULL);
+  stream_sink = pa_stream_new(context_sink, PULSE_SINK_NAME, &nss, &cmap);
 
-//------------------------------------------------------------------------
-//	establish function to be called when data is available
-//------------------------------------------------------------------------
+  //------------------------------------------------------------------
+  //	establish function to be called for status report
+  //------------------------------------------------------------------
 
-	pa_stream_set_read_callback(stream_sink, stream_read_callback_sink, NULL);  // establish callback fcn
+  pa_stream_set_state_callback(stream_sink, stream_state_callback_sink, NULL);
 
-//-----------------------------------------------------------------------------------------
-//	alternate initializations
-//	pa_stream_connect_record(stream, name, NULL, (enum pa_stream_flags) 0);
-//	pa_stream_connect_record(stream, name, &paba, (enum pa_stream_flags) 0);
-//------------------------------------------------------------------------
+  //------------------------------------------------------------------------
+  //	establish function to be called when data is available
+  //------------------------------------------------------------------------
 
-//--------------------------------------
-//	connect to stream
-//--------------------------------------
+  pa_stream_set_read_callback(stream_sink, stream_read_callback_sink, NULL); // establish callback fcn
 
-//	pa_buffer_attr  paba_sink = { 4000, -1, -1, -1, -1 } ; 
+  //-----------------------------------------------------------------------------------------
+  //	alternate initializations
+  //	pa_stream_connect_record(stream, name, NULL, (enum pa_stream_flags) 0);
+  //	pa_stream_connect_record(stream, name, &paba, (enum pa_stream_flags) 0);
+  //------------------------------------------------------------------------
 
-	pa_buffer_attr  paba_sink = { -1, (SAMPLE_SIZE) * 4, -1, SAMPLE_SIZE * 4, -1 } ;
+  //--------------------------------------
+  //	connect to stream
+  //--------------------------------------
 
-	int sink_err = pa_stream_connect_record(stream_sink, name, &paba_sink, 
-		(enum pa_stream_flags) PA_STREAM_ADJUST_LATENCY);
+  //	pa_buffer_attr  paba_sink = { 4000, -1, -1, -1, -1 } ;
 
-	if (sink_err) printf("*** stream connect error\n");
+  pa_buffer_attr paba_sink = {-1, (SAMPLE_SIZE)*4, -1, SAMPLE_SIZE * 4, -1};
 
-	}
+  int sink_err = pa_stream_connect_record(stream_sink, name, &paba_sink,
+                                          (enum pa_stream_flags)PA_STREAM_ADJUST_LATENCY);
 
+  if (sink_err)
+    printf("*** stream connect error\n");
+}
 
+void
+source_create_stream(const char* name, const char* description,
+                     const pa_sample_spec sampSpec, const pa_channel_map cmap)
+{
 
-void	source_create_stream(const char *name, const char *description, 
-		const pa_sample_spec sampSpec, const pa_channel_map cmap) {
+  // MIKE
 
-// MIKE
+  char txt[256];
+  pa_sample_spec nss;
 
-	char txt[256];
-	pa_sample_spec nss;
+  /*------------------------------------------------------------------------------------
+  pa_buffer_attr
+    maxlength = -1;	// Maximum length of the buffer in bytes.
+    tlength = -1;		// Playback only: target length of the buffer.
+    prebuf = -1;		// Playback only: pre-buffering.
+    minreq = -1;		// Playback only: minimum request.
+    fragsize = -1;	// Recording only: server sends data in fragsize block
+  ---------------------------------------------------------------------------------------*/
 
-/*------------------------------------------------------------------------------------
-pa_buffer_attr
-  maxlength = -1;	// Maximum length of the buffer in bytes. 
-  tlength = -1;		// Playback only: target length of the buffer. 
-  prebuf = -1;		// Playback only: pre-buffering. 
-  minreq = -1;		// Playback only: minimum request.
-  fragsize = -1;	// Recording only: server sends data in fragsize block
----------------------------------------------------------------------------------------*/
+  //-------------------------------------
+  //	stream device (channel) name
+  //-------------------------------------
 
-//-------------------------------------
-//	stream device (channel) name
-//-------------------------------------
+  g_free(device_name_source);
+  device_name_source = g_strdup(device_name_source);
 
-	g_free(device_name_source);
-	device_name_source = g_strdup(device_name_source);
+  g_free(device_description_source);
+  device_description_source = g_strdup(device_description_source);
 
-	g_free(device_description_source);
-	device_description_source = g_strdup(device_description_source);
-    
-	nss.format = PA_SAMPLE_FLOAT32;
-	nss.rate = sampSpec.rate;
-	nss.channels = sampSpec.channels; // check your mic - mono or stereo?
-    
-	printf("\n+++ source Sample format for device %s\n", 
-		pa_sample_spec_snprint(txt, sizeof(txt), &nss));
+  nss.format = PA_SAMPLE_FLOAT32;
+  nss.rate = sampSpec.rate;
+  nss.channels = sampSpec.channels; // check your mic - mono or stereo?
 
-	printf("+++ source Create stream Channel map %s\n", 
-		pa_channel_map_snprint(txt, sizeof(txt), &cmap));
+  printf("\n+++ source Sample format for device %s\n",
+         pa_sample_spec_snprint(txt, sizeof(txt), &nss));
 
-//-------------------------------------------------------------------------
-//	establish callbacks and connection for internal players (sinks)
-//-------------------------------------------------------------------------
+  printf("+++ source Create stream Channel map %s\n",
+         pa_channel_map_snprint(txt, sizeof(txt), &cmap));
 
-	stream_source = pa_stream_new(context_source, PULSE_SOURCE_NAME, &nss, &cmap);
+  //-------------------------------------------------------------------------
+  //	establish callbacks and connection for internal players (sinks)
+  //-------------------------------------------------------------------------
 
-//------------------------------------------------------------------
-//	establish function to be called for status report
-//------------------------------------------------------------------
+  stream_source = pa_stream_new(context_source, PULSE_SOURCE_NAME, &nss, &cmap);
 
-	pa_stream_set_state_callback(stream_source, stream_state_callback_source, NULL);
+  //------------------------------------------------------------------
+  //	establish function to be called for status report
+  //------------------------------------------------------------------
 
-//------------------------------------------------------------------------
-//	establish function to be called when data is available
-//------------------------------------------------------------------------
+  pa_stream_set_state_callback(stream_source, stream_state_callback_source, NULL);
 
-	pa_stream_set_read_callback(stream_source, stream_read_callback_source, NULL);
+  //------------------------------------------------------------------------
+  //	establish function to be called when data is available
+  //------------------------------------------------------------------------
 
-//--------------------------------------
-//	connect to stream
-//--------------------------------------
+  pa_stream_set_read_callback(stream_source, stream_read_callback_source, NULL);
 
-	pa_buffer_attr  paba_sink = { 4000, -1, -1, -1, 4000 } ; // adjust sample size
+  //--------------------------------------
+  //	connect to stream
+  //--------------------------------------
 
-	pa_stream_connect_record(stream_source, name, &paba_sink, (enum pa_stream_flags) PA_STREAM_ADJUST_LATENCY);
-	}
+  pa_buffer_attr paba_sink = {4000, -1, -1, -1, 4000}; // adjust sample size
 
+  pa_stream_connect_record(stream_source, name, &paba_sink, (enum pa_stream_flags)PA_STREAM_ADJUST_LATENCY);
+}
 
 //--------------------------------------------------
 //	source (microphone) information callback
 //--------------------------------------------------
 
-void	source_info_callback(pa_context *p, const pa_source_info *si, int is_last, void *dmy) {
+void
+source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void* dmy)
+{
 
-	if (is_last < 0) {
-		if (p == context_sink)
-			show_error_sink("Failed to get sink information");
-		else
-			show_error_source("Failed to get source information");
-		return;
-		}
+  if (is_last < 0)
+    {
+      if (p == context_sink)
+        show_error_sink("Failed to get sink information");
+      else
+        show_error_source("Failed to get source information");
+      return;
+    }
 
-	if (!si) return;
+  if (!si)
+    return;
 
-	char txt[255];
+  char txt[255];
 
-	source_channels = si->channel_map.channels;
+  source_channels = si->channel_map.channels;
 
-	printf("++ channel map for device: %s\n", 
-		pa_channel_map_snprint(txt, sizeof(txt), &si->channel_map));
+  printf("++ channel map for device: %s\n",
+         pa_channel_map_snprint(txt, sizeof(txt), &si->channel_map));
 
-	printf("+++ name: %s\n", si->name);
-	printf("+++ index: %d\n", si->index);
-	printf("+++ volume: %d\n", si->volume);
-	printf("+++ n_ports: %d\n", si->n_ports);
-	printf("\n");
+  printf("+++ name: %s\n", si->name);
+  printf("+++ index: %d\n", si->index);
+  printf("+++ volume: %d\n", si->volume);
+  printf("+++ n_ports: %d\n", si->n_ports);
+  printf("\n");
 
-	if (si->n_ports > 0) {
-		for (int i = 0; i < si->n_ports; i++)  {
-			printf("+++ pa_source_port_info name %d: %s\n", i, si->ports[i]->name);
-			printf("+++ pa_source_port_info priority %d: %d\n", i, si->ports[i]->priority);
-			printf("+++ pa_source_port_info avail %d: %d\n", i, si->ports[i]->available == PA_PORT_AVAILABLE_YES);
-		}
-		printf("+++ pa_source_port_info active port name: %s\n", si->active_port->name);
-		printf("\n");
-		printf("+++ source channels %d\n", source_channels);
-		printf("+++ map to name: %s\n", pa_channel_map_to_name(&si->channel_map));
-		printf("+++ description: %s\n", si->description);
-		}
+  if (si->n_ports > 0)
+    {
+      for (int i = 0; i < si->n_ports; i++)
+        {
+          printf("+++ pa_source_port_info name %d: %s\n", i, si->ports[i]->name);
+          printf("+++ pa_source_port_info priority %d: %d\n", i, si->ports[i]->priority);
+          printf("+++ pa_source_port_info avail %d: %d\n", i, si->ports[i]->available == PA_PORT_AVAILABLE_YES);
+        }
+      printf("+++ pa_source_port_info active port name: %s\n", si->active_port->name);
+      printf("\n");
+      printf("+++ source channels %d\n", source_channels);
+      printf("+++ map to name: %s\n", pa_channel_map_to_name(&si->channel_map));
+      printf("+++ description: %s\n", si->description);
+    }
 
-	source_create_stream(si->name, si->description, si->sample_spec, si->channel_map);
-
-	}
-
+  source_create_stream(si->name, si->description, si->sample_spec, si->channel_map);
+}
 
 //--------------------------------------------------
 //	information callback
 //--------------------------------------------------
 
-void	sink_info_callback(pa_context *p, const pa_sink_info *si, int is_last, void *dmy) {
+void
+sink_info_callback(pa_context* p, const pa_sink_info* si, int is_last, void* dmy)
+{
+
+  // PLAYBACK
+
+  if (is_last < 0)
+    {
+      if (p == context_sink)
+        show_error_sink("Failed to get sink information");
+      else
+        show_error_source("Failed to get source information");
+      return;
+    }
+
+  if (!si)
+    return;
+
+  sink_channels = si->channel_map.channels;
+
+  printf("sink channels %d\n", sink_channels);
+
+  sink_create_stream(si->monitor_source_name, si->description, si->sample_spec, si->channel_map);
+}
+
+void
+sink_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy)
+{
+
+  // PLAYBACK
+
+  pa_operation* p1;
 
-// PLAYBACK
+  if (!si)
+    {
+      if (c == context_sink)
+        show_error_sink("Failed to get sink information");
+      else
+        show_error_source("Failed to get source information");
+      return;
+    }
+
+  strcpy(default_sink, si->default_sink_name);
+  strcpy(default_source, si->default_source_name);
 
-	if (is_last < 0) {
-		if (p == context_sink)
-			show_error_sink("Failed to get sink information");
-		else
-			show_error_source("Failed to get source information");
-		return;
-		}
+  printf("Server info callback name of default source:\n\t%s\n", default_source);
+  printf("Server info callback name of default sink:\n\t%s\n", default_sink);
 
-	if (!si) return;
+  if (!si->default_sink_name)
+    {
+      show_error_sink("No default sink set.");
+      return;
+    }
 
-	sink_channels = si->channel_map.channels;
+  p1 = pa_context_get_sink_info_by_name(
+    c,
+    si->default_sink_name,
+    sink_info_callback,
+    NULL);
 
-	printf("sink channels %d\n", sink_channels);
+  pa_operation_unref(p1);
+}
 
-	sink_create_stream(si->monitor_source_name, si->description, si->sample_spec, si->channel_map);
-	}
+void
+source_server_info_callback(pa_context* c, const pa_server_info* si, void* dmy)
+{
 
+  pa_operation* p1;
 
-void	sink_server_info_callback(pa_context *c, const pa_server_info *si, void *dmy) {
+  if (!si)
+    {
+      if (c == context_sink)
+        show_error_sink("Failed to get sink information");
+      else
+        show_error_source("Failed to get source information");
+      return;
+    }
 
-// PLAYBACK
+  strcpy(default_sink, si->default_sink_name);
+  strcpy(default_source, si->default_source_name);
 
-	pa_operation *p1;
+  printf("Server info callback name of default source:\n\t%s\n", default_source);
+  printf("Server info callback name of default sink:\n\t%s\n", default_sink);
 
-	if (!si) {
-		if (c == context_sink)
-			show_error_sink("Failed to get sink information");
-		else
-			show_error_source("Failed to get source information");
-		return;
-		}
+  printf("------- acquire microphone\n");
 
-	strcpy(default_sink, si->default_sink_name);
-	strcpy(default_source, si->default_source_name);
+  if (!si->default_source_name)
+    {
+      show_error_source("No default source set.");
+      return;
+    }
 
-	printf("Server info callback name of default source:\n\t%s\n", default_source);
-	printf("Server info callback name of default sink:\n\t%s\n", default_sink);
+  //----------------------------------------------------------------------------------------
+  //		if there is an external source (microphone), its name begins 'alsa_input'
+  //----------------------------------------------------------------------------------------
 
-		if (!si->default_sink_name) {
-			show_error_sink("No default sink set.");
-			return;
-			}
+  printf("default source name =  %s\n", si->default_source_name);
+  if (strncmp(si->default_source_name, "alsa_input", 10) == 0 && strncmp(si->default_source_name, "RDPSource", 9) == 0)
+    {
+      printf("*** no microphone detected\n");
+      no_microphone = 1;
+      return;
+    }
 
-		p1 = pa_context_get_sink_info_by_name (
-			c, 
-			si->default_sink_name, 
-			sink_info_callback, 
-			NULL);
+  printf("*** microphone found\n");
+  no_microphone = 0;
 
-		pa_operation_unref(p1);
+  //                if (strncmp(si->default_source_name, "alsa_input", 10) != 0) {
+  //                        printf("*** no microphone detected\n");
+  //                        no_microphone = 1;
+  //                        return;
+  //                        }
 
-	}
+  //                printf("*** microphone found\n");
+  //                no_microphone = 0;
 
+  //----------------------------------------------------------
+  //		establish call back to receive source info
+  //----------------------------------------------------------
 
-void	source_server_info_callback(pa_context *c, const pa_server_info *si, void *dmy) {
+  printf("default source name %s\n", si->default_source_name);
+  p1 = pa_context_get_source_info_by_name(c, si->default_source_name, source_info_callback, NULL);
 
-	pa_operation *p1;
+  pa_operation_unref(p1);
+}
 
-	if (!si) {
-		if (c == context_sink)
-			show_error_sink("Failed to get sink information");
-		else
-			show_error_source("Failed to get source information");
-		return;
-		}
+void
+source_connection_state_callback(pa_context* c, void* dmy)
+{
 
-	strcpy(default_sink, si->default_sink_name);
-	strcpy(default_source, si->default_source_name);
+  pa_operation* p1;
 
-	printf("Server info callback name of default source:\n\t%s\n", default_source);
-	printf("Server info callback name of default sink:\n\t%s\n", default_sink);
+  switch (pa_context_get_state(c))
+    {
 
-	printf("------- acquire microphone\n");
+    case PA_CONTEXT_UNCONNECTED:
+      printf("+++++ source unconnected\n");
+      break;
 
-	if (!si->default_source_name) {
-		show_error_source("No default source set.");
-		return;
-		}
+    case PA_CONTEXT_CONNECTING:
+      printf("+++++ source connecting\n");
+      break;
 
-//----------------------------------------------------------------------------------------
-//		if there is an external source (microphone), its name begins 'alsa_input'
-//----------------------------------------------------------------------------------------
+    case PA_CONTEXT_AUTHORIZING:
+      printf("+++++ source authorizing\n");
+      break;
 
+    case PA_CONTEXT_SETTING_NAME:
+      printf("+++++ source setting name\n");
+      break;
 
-        printf("default source name =  %s\n", si->default_source_name);
-                if (strncmp(si->default_source_name, "alsa_input", 10) == 0 &&
-                        strncmp(si->default_source_name, "RDPSource", 9) == 0) {
-                        printf("*** no microphone detected\n");
-                        no_microphone = 1;
-                        return;
-                        }
+    case PA_CONTEXT_READY:
 
-                printf("*** microphone found\n");
-                no_microphone = 0;
+      p1 = pa_context_get_server_info(c, source_server_info_callback, dmy);
+      pa_operation_unref(p1);
+      break;
 
+    case PA_CONTEXT_FAILED:
 
-//                if (strncmp(si->default_source_name, "alsa_input", 10) != 0) {
-//                        printf("*** no microphone detected\n");
-//                        no_microphone = 1;
-//                        return;
-//                        }
+      if (c == context_sink)
+        show_error_sink("Connection failed.");
+      break;
 
-//                printf("*** microphone found\n");
-//                no_microphone = 0;
+    case PA_CONTEXT_TERMINATED:
+      on_destroy();
 
-//----------------------------------------------------------
-//		establish call back to receive source info
-//----------------------------------------------------------
+    default:
+      printf("+++++ default\n");
+    }
+}
 
-		printf("default source name %s\n", si->default_source_name);
-		p1  = pa_context_get_source_info_by_name (c, si->default_source_name, source_info_callback, NULL);
+void
+sink_connection_state_callback(pa_context* c, void* dmy)
+{
 
-		pa_operation_unref(p1);
+  pa_operation* p1;
 
-	}
+  switch (pa_context_get_state(c))
+    {
 
+    case PA_CONTEXT_UNCONNECTED:
+      printf("+++++ sink unconnected\n");
+      break;
 
+    case PA_CONTEXT_CONNECTING:
+      printf("+++++ sink connecting\n");
+      break;
 
-void    source_connection_state_callback(pa_context *c, void *dmy) {
+    case PA_CONTEXT_AUTHORIZING:
+      printf("+++++ sink authorizing\n");
+      break;
 
-        pa_operation *p1;
+    case PA_CONTEXT_SETTING_NAME:
+      printf("+++++ sink setting name\n");
+      break;
 
-        switch (pa_context_get_state(c)) {
+    case PA_CONTEXT_READY:
 
-		case PA_CONTEXT_UNCONNECTED:
-			printf("+++++ source unconnected\n");
-			break;
+      p1 = pa_context_get_server_info(
+        c,
+        sink_server_info_callback,
+        NULL);
 
-		case PA_CONTEXT_CONNECTING:
-			printf("+++++ source connecting\n");
-			break;
+      pa_operation_unref(p1);
 
-		case PA_CONTEXT_AUTHORIZING:
-			printf("+++++ source authorizing\n");
-			break;
+      break;
 
-		case PA_CONTEXT_SETTING_NAME:
-			printf("+++++ source setting name\n");
-			break;
+    case PA_CONTEXT_FAILED:
 
-		case PA_CONTEXT_READY:
+      if (c == context_sink)
+        show_error_sink("Connection failed.");
+      else
+        show_error_source("Connection failed.");
+      break;
 
-			p1 = pa_context_get_server_info(c, source_server_info_callback, dmy);
-			pa_operation_unref(p1);
-			break;
+    case PA_CONTEXT_TERMINATED:
+      on_destroy();
 
-		case PA_CONTEXT_FAILED:
-
-			if (c == context_sink)
-				show_error_sink("Connection failed.");
-			break;
-
-		case PA_CONTEXT_TERMINATED:
-			on_destroy();
-
-		default:        printf("+++++ default\n");
-
-                }
-        }
-
-
-void	sink_connection_state_callback(pa_context *c, void *dmy) {
-
-	pa_operation *p1;
-
-	switch (pa_context_get_state(c)) {
-
-		case PA_CONTEXT_UNCONNECTED:
-			printf("+++++ sink unconnected\n");
-			break;
-
-		case PA_CONTEXT_CONNECTING:
-			printf("+++++ sink connecting\n");
-			break;
-
-		case PA_CONTEXT_AUTHORIZING:
-			printf("+++++ sink authorizing\n");
-			break;
-
-		case PA_CONTEXT_SETTING_NAME:
-			printf("+++++ sink setting name\n");
-			break;
-
-		case PA_CONTEXT_READY: 
-
-			p1 = pa_context_get_server_info(
-				c, 
-				sink_server_info_callback, 
-				NULL);
-
-			pa_operation_unref(p1);
-            
-			break;
-            
-		case PA_CONTEXT_FAILED:
-
-			if (c == context_sink)
-				show_error_sink("Connection failed.");
-			else
-				show_error_source("Connection failed.");
-			break;
-            
-		case PA_CONTEXT_TERMINATED:
-			on_destroy();
-
-		default:	printf("+++++ default\n");
-    		}
-	}
+    default:
+      printf("+++++ default\n");
+    }
+}

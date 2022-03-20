@@ -34,53 +34,52 @@
 
 // PLAYER SINK
 
-	printf("\n------------------ sink connect --------\n");
+printf("\n------------------ sink connect --------\n");
 
-	GMainContext *mcd_sink;
-            
-        mcd_sink = g_main_context_default();
+GMainContext* mcd_sink;
 
-        m_sink = pa_glib_mainloop_new(mcd_sink);
+mcd_sink = g_main_context_default();
 
-	pa_mainloop_api * mla_sink;
-            
-        mla_sink = pa_glib_mainloop_get_api(m_sink);
+m_sink = pa_glib_mainloop_new(mcd_sink);
 
-        context_sink = pa_context_new(mla_sink, PULSE_SINK_NAME);
-            
-        pa_context_set_state_callback(
-		context_sink, 
-		sink_connection_state_callback, 
-		NULL);
+pa_mainloop_api* mla_sink;
 
-	if (pa_context_connect(context_sink, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL) < 0 )
-		printf("*** sink context connect error\n");
+mla_sink = pa_glib_mainloop_get_api(m_sink);
 
-	printf("*** sink connected\n");
+context_sink = pa_context_new(mla_sink, PULSE_SINK_NAME);
+
+pa_context_set_state_callback(
+  context_sink,
+  sink_connection_state_callback,
+  NULL);
+
+if (pa_context_connect(context_sink, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL) < 0)
+  printf("*** sink context connect error\n");
+
+printf("*** sink connected\n");
 
 // MICROPHONE SOURCE
 
-	printf("\n------------------ source connect --------\n");
+printf("\n------------------ source connect --------\n");
 
-	GMainContext *mcd_source;
+GMainContext* mcd_source;
 
-	mcd_source = g_main_context_default();
-	
-	m_source = pa_glib_mainloop_new(mcd_source);
+mcd_source = g_main_context_default();
 
-	pa_mainloop_api * mla_source;
+m_source = pa_glib_mainloop_new(mcd_source);
 
-	mla_source = pa_glib_mainloop_get_api(m_source);
+pa_mainloop_api* mla_source;
 
-	context_source = pa_context_new(mla_source, PULSE_SOURCE_NAME);
+mla_source = pa_glib_mainloop_get_api(m_source);
 
-	pa_context_set_state_callback(
-		context_source, 
-		source_connection_state_callback, 
-		NULL);
+context_source = pa_context_new(mla_source, PULSE_SOURCE_NAME);
 
-	if (pa_context_connect(context_source, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL) < 0 )
-	printf("*** source context connect error\n");
+pa_context_set_state_callback(
+  context_source,
+  source_connection_state_callback,
+  NULL);
 
-	printf("*** source connected\n");
+if (pa_context_connect(context_source, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL) < 0)
+  printf("*** source context connect error\n");
 
+printf("*** source connected\n");

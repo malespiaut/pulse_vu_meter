@@ -31,349 +31,383 @@
 #include <config.h>
 #endif
 
+#include <ctype.h>
+#include <errno.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <unistd.h>
 #include <string.h>
-#include <errno.h>
+#include <sys/types.h>
 #include <time.h>
-#include <ctype.h>
+#include <unistd.h>
 
 #include "functions.h"
 
 #include "global-extern-variables.h"
 
-static	const pa_sample_spec sampSpec = {
-        .format = PA_SAMPLE_FLOAT32LE,
-        .rate = 44100,
-        .channels = 2
-        };
+static const pa_sample_spec sampSpec = {
+  .format = PA_SAMPLE_FLOAT32LE,
+  .rate = 44100,
+  .channels = 2};
 
 //--------------------------------------------------------------------
 //	main timer process
 //	called every 100 milliseconds to update the meteres and graphs.
 //--------------------------------------------------------------------
 
-gboolean	pulse_timer_handler() { // check pulse every 100 millisecs
+gboolean
+pulse_timer_handler()
+{ // check pulse every 100 millisecs
 
-        static int rx = 0;
-        double ra = 0.0;
+  static int rx = 0;
+  double ra = 0.0;
 
-        static int lx = 0;
-        double la = 0.0;
+  static int lx = 0;
+  double la = 0.0;
 
-        rUtil = log10(RightChan + 1) * FACTOR;
-        lUtil = log10(LeftChan + 1) * FACTOR;
+  rUtil = log10(RightChan + 1) * FACTOR;
+  lUtil = log10(LeftChan + 1) * FACTOR;
 
-	LeftChan = RightChan = 0.0;
+  LeftChan = RightChan = 0.0;
 
-//----------------------
-//	shift the data
-//----------------------
+  //----------------------
+  //	shift the data
+  //----------------------
 
-        for (int i = 99; i > 0; i--) rchan[i] = rchan[i-1];
-        for (int i = 99; i > 0; i--) lchan[i] = lchan[i-1];
+  for (int i = 99; i > 0; i--)
+    rchan[i] = rchan[i - 1];
+  for (int i = 99; i > 0; i--)
+    lchan[i] = lchan[i - 1];
 
-        rchan[0] = rUtil;
-        lchan[0] = lUtil;
+  rchan[0] = rUtil;
+  lchan[0] = lUtil;
 
-//----------------------------------------------
-//	average the past 3 to dampen movement
-//----------------------------------------------
+  //----------------------------------------------
+  //	average the past 3 to dampen movement
+  //----------------------------------------------
 
-//	lchan[0] = (lchan[0] + lchan[1] + lchan[2]) / 3.0;
-//	rchan[0] = (rchan[0] + rchan[1] + rchan[2]) / 3.0;
+  //	lchan[0] = (lchan[0] + lchan[1] + lchan[2]) / 3.0;
+  //	rchan[0] = (rchan[0] + rchan[1] + rchan[2]) / 3.0;
 
-//--------------------------
-//	que draw events
-//--------------------------
+  //--------------------------
+  //	que draw events
+  //--------------------------
 
-        gtk_widget_queue_draw (draw1);
-        gtk_widget_queue_draw (draw2);
-        return TRUE;
-        }
+  gtk_widget_queue_draw(draw1);
+  gtk_widget_queue_draw(draw2);
+  return TRUE;
+}
 
 //--------------------------
 //	draw meters
 //--------------------------
 
-void	needles(cairo_t *cr, double hor, double ver, double len, double t1, double t2, int cFlg, double Max) {
+void
+needles(cairo_t* cr, double hor, double ver, double len, double t1, double t2, int cFlg, double Max)
+{
 
-	double x, x1, x2, y, y1, y2;
-	double X = 0.0;
+  double x, x1, x2, y, y1, y2;
+  double X = 0.0;
 
-	ver = ver + 1.0;
+  ver = ver + 1.0;
 
-	if (t1 > M_PI) t1 = M_PI;
+  if (t1 > M_PI)
+    t1 = M_PI;
 
-//------------------------------------------------------------------------------
-//	color is same as needle until past needle point and then color is gray
-//------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------
+  //	color is same as needle until past needle point and then color is gray
+  //------------------------------------------------------------------------------
 
-	X = 0.0;
+  X = 0.0;
 
-	if (!legacy_vumeters) {
+  if (!legacy_vumeters)
+    {
 
-	if (cFlg == 0) cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);		// black
-	else if (cFlg == 1) cairo_set_source_rgb(cr, 1.0, 1.0, 0.3);		// yellow
-	else if (cFlg == 2) cairo_set_source_rgb(cr, 1.0, 0., 0.);	// red
-	else if (cFlg == 3) cairo_set_source_rgb(cr, 0.5, 1.0, 0.5);	// green
-	else if (cFlg == 4) cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);	// gray
+      if (cFlg == 0)
+        cairo_set_source_rgb(cr, 0.0, 0.0, 0.0); // black
+      else if (cFlg == 1)
+        cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+      else if (cFlg == 2)
+        cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+      else if (cFlg == 3)
+        cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+      else if (cFlg == 4)
+        cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
 
-	cairo_set_line_width(cr, 2.5);
+      cairo_set_line_width(cr, 2.5);
 
-//--------------------------------------------
-//	draw all short and long hash marks
-//--------------------------------------------
+      //--------------------------------------------
+      //	draw all short and long hash marks
+      //--------------------------------------------
 
-	for (int i = 0; i< 21; i++ ) {
+      for (int i = 0; i < 21; i++)
+        {
 
-//-------------------------------
-//		long hash marks
-//-------------------------------
+          //-------------------------------
+          //		long hash marks
+          //-------------------------------
 
-		if (! (i % 2) ) {
+          if (!(i % 2))
+            {
 
-			cairo_arc (cr, hor, ver, len + 10, -M_PI, -M_PI + X);	// further point
-			cairo_get_current_point (cr, &x, &y);
+              cairo_arc(cr, hor, ver, len + 10, -M_PI, -M_PI + X); // further point
+              cairo_get_current_point(cr, &x, &y);
 
-			cairo_arc (cr, hor, ver, len, -M_PI, -M_PI + X);	// nearer point
-			cairo_get_current_point (cr, &x1, &y1);
-	
-			cairo_new_path (cr);
-			cairo_move_to(cr, x, y);
-			cairo_line_to (cr, x1, y1 );
-			cairo_stroke (cr);
-			}
+              cairo_arc(cr, hor, ver, len, -M_PI, -M_PI + X); // nearer point
+              cairo_get_current_point(cr, &x1, &y1);
 
-//-----------------------------------
-//		short hash marks
-//-----------------------------------
+              cairo_new_path(cr);
+              cairo_move_to(cr, x, y);
+              cairo_line_to(cr, x1, y1);
+              cairo_stroke(cr);
+            }
 
-		else {
-			cairo_arc (cr, hor, ver, len + 2, -M_PI, -M_PI + X); // further point
-			cairo_get_current_point (cr, &x, &y);
+          //-----------------------------------
+          //		short hash marks
+          //-----------------------------------
 
-			cairo_arc (cr, hor, ver, len - 1, -M_PI, -M_PI + X); // nearer point length
-			cairo_get_current_point (cr, &x1, &y1);
-			}
+          else
+            {
+              cairo_arc(cr, hor, ver, len + 2, -M_PI, -M_PI + X); // further point
+              cairo_get_current_point(cr, &x, &y);
 
-		if (X > t1) {	// are we past the level point?
+              cairo_arc(cr, hor, ver, len - 1, -M_PI, -M_PI + X); // nearer point length
+              cairo_get_current_point(cr, &x1, &y1);
+            }
 
-//--------------------------------------------------------------
-//			no more colored short hash marks
-//--------------------------------------------------------------
+          if (X > t1)
+            { // are we past the level point?
 
-		cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);	// gray
-		cairo_new_path (cr);
-		cairo_move_to(cr, x, y);
-		cairo_line_to (cr, x1, y1 );
-		cairo_stroke (cr);
+              //--------------------------------------------------------------
+              //			no more colored short hash marks
+              //--------------------------------------------------------------
 
-//----------------------------------------------------------------------------
-//			short marks from here only for balance
-//----------------------------------------------------------------------------
+              cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
+              cairo_new_path(cr);
+              cairo_move_to(cr, x, y);
+              cairo_line_to(cr, x1, y1);
+              cairo_stroke(cr);
 
-			if (cFlg != 4) {
-				X = X + M_PI / 20.0;	// keep incrementing
-				continue;
-				}
-			}
+              //----------------------------------------------------------------------------
+              //			short marks from here only for balance
+              //----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------
-//		draw a short hash mark using numbers from above.
-//-----------------------------------------------------------------
-
-		cairo_new_path (cr);
-		cairo_move_to(cr, x, y);
-		cairo_line_to (cr, x1, y1 );
-		cairo_stroke (cr);
-
-		X = X + M_PI / 20.0; // advance point on arc
-		}
-
-//----------------------------
-//	RMS level
-//----------------------------
-
-	if (Max > 0.0) {
-
-		cairo_set_line_width(cr, 5.0);
-
-		if (Max > M_PI) Max = M_PI;
-
-		if (cFlg == 1) cairo_set_source_rgb(cr, 1.0, 1.0, 0.3);		// yellow
-		else if (cFlg == 2) cairo_set_source_rgb(cr, 1.0, 0., 0.);	// red
-		else if (cFlg == 3) cairo_set_source_rgb(cr, 0.5, 1.0, 0.5);	// green
-		else if (cFlg == 4) cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);	// gray
-
-		cairo_arc (cr, hor, ver, len + 10, -M_PI, -M_PI + Max);		// further point
-		cairo_get_current_point (cr, &x, &y);
-	
-		cairo_arc (cr, hor, ver, len + 16 , -M_PI, -M_PI + Max);		// nearer point
-		cairo_get_current_point (cr, &x1, &y1);
-		
-		cairo_new_path (cr);
-		cairo_move_to(cr, x, y);
-		cairo_line_to (cr, x1, y1 );
-		cairo_stroke (cr);
-		}
-
-//--------------------
-//	Max level
-//--------------------
-
-	if (t2 > 0.0) {
-		cairo_set_line_width(cr, 2.5);
-
-		if (t2 > M_PI) t2 = M_PI;
-
-		if (cFlg == 1) cairo_set_source_rgb(cr, 1.0, 1.0, 0.3);		// yellow
-		else if (cFlg == 2) cairo_set_source_rgb(cr, 1.0, 0., 0.);	// red
-		else if (cFlg == 3) cairo_set_source_rgb(cr, 0.5, 1.0, 0.5);	// green
-		else if (cFlg == 4) cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);	// gray
-
-		cairo_arc (cr, hor, ver, len + 10, -M_PI, -M_PI + t2);		// further point
-		cairo_get_current_point (cr, &x, &y);
-	
-		cairo_arc (cr, hor, ver, len + 16, -M_PI, -M_PI + t2);		// nearer point
-		cairo_get_current_point (cr, &x1, &y1);
-		
-		cairo_new_path (cr);
-		cairo_move_to(cr, x, y);
-		cairo_line_to (cr, x1, y1 );
-		cairo_stroke (cr);
-		}
-
-		}
-
-//----------------
-//	draw needle
-//----------------
-
-	cairo_set_line_width(cr, 2.5);
-
-	if (cFlg == 0) cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);		// black
-	else if (cFlg == 1) cairo_set_source_rgb(cr, 1.0, 1.0, 0.3);		// yellow
-	else if (cFlg == 2) cairo_set_source_rgb(cr, 1.0, 0., 0.);	// red
-	else if (cFlg == 3) cairo_set_source_rgb(cr, 0.5, 1.0, 0.5);	// green
-	else if (cFlg == 4) cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);	// black
-
-	cairo_set_line_width(cr, 3.5);
-
-//-------------------------------------
-//	arc from left horizon to t1
-//-------------------------------------
-
-	cairo_arc (cr, hor, ver, len, -M_PI, -M_PI + t1);
-
-//----------------------------------------
-//	get coordinates of point on arc
-//----------------------------------------
-
-	cairo_get_current_point (cr, &x, &y);
-
-//-----------------------------------------------
-//	draw a line from the origin to the point
-//-----------------------------------------------
-
-	cairo_new_path (cr);
-	cairo_move_to(cr, x, y);
-	cairo_line_to (cr, hor, ver );
-	cairo_stroke (cr);
-
-if (legacy_vumeters) return;
-
-//--------------
-//	arcs
-//--------------
-
-        if (cFlg == 4) {  // balance meter - always show arc
-
-//------------------------------------------------------------------------
-//		leans left - M_PI_2 is PI/2 -> -M_PI_2 is center of arc
-//------------------------------------------------------------------------
-
-		if ( t1 < M_PI_2) {
-
-			cairo_set_source_rgb(cr, 1.0, 1.0, 0.3);	// yellow
-
-//------------------------------------------
-//			from left to center
-//------------------------------------------
-
-                	cairo_arc (cr, hor, ver, len-2, -M_PI + t1, -M_PI_2); // left to center
-                	cairo_line_to (cr, hor, ver );
-                	cairo_fill(cr); // fill in arc
-                	cairo_stroke (cr);
-			}
-
-//------------------------------------------------------------------------
-//		leans right - M_PI_2 is PI/2 -> -M_PI_2 is center of arc
-//------------------------------------------------------------------------
-
-		else  { 
-			cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); // red
-
-//------------------------------------------
-//			from center to right
-//------------------------------------------
-
-//--------------------------------------------------------------------
-//			following adds line from current point to arc as well.
-//			current point is the last cairo_line_to above (the origin)
-//--------------------------------------------------------------------
-
-                	cairo_arc (cr, hor, ver, len-2, -M_PI_2, -M_PI + t1); // center to right
-                	cairo_line_to (cr, hor, ver );
-                	cairo_fill(cr); // fill in arc
-                	cairo_stroke (cr);
-			} 
-
-		cairo_set_source_rgb(cr, 0.6, 0.6, 0.6);	// gray
-
+              if (cFlg != 4)
+                {
+                  X = X + M_PI / 20.0; // keep incrementing
+                  continue;
                 }
+            }
 
-//-----------------------------
-//	other arcs is enabled
-//-----------------------------
+          //-----------------------------------------------------------------
+          //		draw a short hash mark using numbers from above.
+          //-----------------------------------------------------------------
 
-        if (cFlg != 4 && showArc) { 
+          cairo_new_path(cr);
+          cairo_move_to(cr, x, y);
+          cairo_line_to(cr, x1, y1);
+          cairo_stroke(cr);
 
-//--------------------------------------------
-//		draw arc from left horizon to t1
-//--------------------------------------------
+          X = X + M_PI / 20.0; // advance point on arc
+        }
 
-//--------------------------------------------------------------------
-//		following adds line from current point to arc as well.
-//		current point is the last cairo_line_to above (the origin)
-//--------------------------------------------------------------------
+      //----------------------------
+      //	RMS level
+      //----------------------------
 
-                cairo_arc (cr, hor, ver, len-2, -M_PI, -M_PI + t1);
-                cairo_line_to (cr, hor, ver );
-                cairo_fill(cr); // fill in arc
-                cairo_stroke (cr);
+      if (Max > 0.0)
+        {
 
-                }
+          cairo_set_line_width(cr, 5.0);
 
-//-------------------------
-//	spindle - full arc
-//-------------------------
+          if (Max > M_PI)
+            Max = M_PI;
 
-//--------------------------------------------------------------------
-//	following adds line from current point to arc as well.
-//	current point is the last cairo_line_to above (the origin)
-//--------------------------------------------------------------------
+          if (cFlg == 1)
+            cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+          else if (cFlg == 2)
+            cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+          else if (cFlg == 3)
+            cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+          else if (cFlg == 4)
+            cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
 
-        cairo_arc (cr, hor, ver, 4.0, -M_PI, M_PI );
-        cairo_line_to (cr, hor, ver );
-        cairo_fill(cr); // fill in arc
+          cairo_arc(cr, hor, ver, len + 10, -M_PI, -M_PI + Max); // further point
+          cairo_get_current_point(cr, &x, &y);
 
-	}
+          cairo_arc(cr, hor, ver, len + 16, -M_PI, -M_PI + Max); // nearer point
+          cairo_get_current_point(cr, &x1, &y1);
+
+          cairo_new_path(cr);
+          cairo_move_to(cr, x, y);
+          cairo_line_to(cr, x1, y1);
+          cairo_stroke(cr);
+        }
+
+      //--------------------
+      //	Max level
+      //--------------------
+
+      if (t2 > 0.0)
+        {
+          cairo_set_line_width(cr, 2.5);
+
+          if (t2 > M_PI)
+            t2 = M_PI;
+
+          if (cFlg == 1)
+            cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+          else if (cFlg == 2)
+            cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+          else if (cFlg == 3)
+            cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+          else if (cFlg == 4)
+            cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // gray
+
+          cairo_arc(cr, hor, ver, len + 10, -M_PI, -M_PI + t2); // further point
+          cairo_get_current_point(cr, &x, &y);
+
+          cairo_arc(cr, hor, ver, len + 16, -M_PI, -M_PI + t2); // nearer point
+          cairo_get_current_point(cr, &x1, &y1);
+
+          cairo_new_path(cr);
+          cairo_move_to(cr, x, y);
+          cairo_line_to(cr, x1, y1);
+          cairo_stroke(cr);
+        }
+    }
+
+  //----------------
+  //	draw needle
+  //----------------
+
+  cairo_set_line_width(cr, 2.5);
+
+  if (cFlg == 0)
+    cairo_set_source_rgb(cr, 0.0, 0.0, 0.0); // black
+  else if (cFlg == 1)
+    cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+  else if (cFlg == 2)
+    cairo_set_source_rgb(cr, 1.0, 0., 0.); // red
+  else if (cFlg == 3)
+    cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+  else if (cFlg == 4)
+    cairo_set_source_rgb(cr, 0.5, 0.5, 0.5); // black
+
+  cairo_set_line_width(cr, 3.5);
+
+  //-------------------------------------
+  //	arc from left horizon to t1
+  //-------------------------------------
+
+  cairo_arc(cr, hor, ver, len, -M_PI, -M_PI + t1);
+
+  //----------------------------------------
+  //	get coordinates of point on arc
+  //----------------------------------------
+
+  cairo_get_current_point(cr, &x, &y);
+
+  //-----------------------------------------------
+  //	draw a line from the origin to the point
+  //-----------------------------------------------
+
+  cairo_new_path(cr);
+  cairo_move_to(cr, x, y);
+  cairo_line_to(cr, hor, ver);
+  cairo_stroke(cr);
+
+  if (legacy_vumeters)
+    return;
+
+  //--------------
+  //	arcs
+  //--------------
+
+  if (cFlg == 4)
+    { // balance meter - always show arc
+
+      //------------------------------------------------------------------------
+      //		leans left - M_PI_2 is PI/2 -> -M_PI_2 is center of arc
+      //------------------------------------------------------------------------
+
+      if (t1 < M_PI_2)
+        {
+
+          cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+
+          //------------------------------------------
+          //			from left to center
+          //------------------------------------------
+
+          cairo_arc(cr, hor, ver, len - 2, -M_PI + t1, -M_PI_2); // left to center
+          cairo_line_to(cr, hor, ver);
+          cairo_fill(cr); // fill in arc
+          cairo_stroke(cr);
+        }
+
+      //------------------------------------------------------------------------
+      //		leans right - M_PI_2 is PI/2 -> -M_PI_2 is center of arc
+      //------------------------------------------------------------------------
+
+      else
+        {
+          cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); // red
+
+          //------------------------------------------
+          //			from center to right
+          //------------------------------------------
+
+          //--------------------------------------------------------------------
+          //			following adds line from current point to arc as well.
+          //			current point is the last cairo_line_to above (the origin)
+          //--------------------------------------------------------------------
+
+          cairo_arc(cr, hor, ver, len - 2, -M_PI_2, -M_PI + t1); // center to right
+          cairo_line_to(cr, hor, ver);
+          cairo_fill(cr); // fill in arc
+          cairo_stroke(cr);
+        }
+
+      cairo_set_source_rgb(cr, 0.6, 0.6, 0.6); // gray
+    }
+
+  //-----------------------------
+  //	other arcs is enabled
+  //-----------------------------
+
+  if (cFlg != 4 && showArc)
+    {
+
+      //--------------------------------------------
+      //		draw arc from left horizon to t1
+      //--------------------------------------------
+
+      //--------------------------------------------------------------------
+      //		following adds line from current point to arc as well.
+      //		current point is the last cairo_line_to above (the origin)
+      //--------------------------------------------------------------------
+
+      cairo_arc(cr, hor, ver, len - 2, -M_PI, -M_PI + t1);
+      cairo_line_to(cr, hor, ver);
+      cairo_fill(cr); // fill in arc
+      cairo_stroke(cr);
+    }
+
+  //-------------------------
+  //	spindle - full arc
+  //-------------------------
+
+  //--------------------------------------------------------------------
+  //	following adds line from current point to arc as well.
+  //	current point is the last cairo_line_to above (the origin)
+  //--------------------------------------------------------------------
+
+  cairo_arc(cr, hor, ver, 4.0, -M_PI, M_PI);
+  cairo_line_to(cr, hor, ver);
+  cairo_fill(cr); // fill in arc
+}
 
 int display_bars = 1;
 
@@ -384,21 +418,21 @@ float UPPER_MAX_MAX = DRAW_HEIGHT - DRAW_HEIGHT / 20.0;
 
 #define SPECTRUM_PEAK DRAW_HEIGHT - 30.0 // maximum graph level for freq spectrum (clamp level)`
 
-#define SCALE_BASELINE_SPECTRUM DRAW_HEIGHT / 160.0     
-#define SCALE_MIDLINE_SPECTRUM DRAW_HEIGHT / 250.0     
+#define SCALE_BASELINE_SPECTRUM DRAW_HEIGHT / 160.0
+#define SCALE_MIDLINE_SPECTRUM DRAW_HEIGHT / 250.0
 
 #define SCALE_BASELINE_VOLUME DRAW_HEIGHT / 150.0
 
-//	colors of warning level limits 
+//	colors of warning level limits
 
-#define UPPER_MAX_MAX_COLOR cairo_set_source_rgb(cr, 1.0, 0.0, 1.0); 
-#define UPPER_MAX_COLOR cairo_set_source_rgb(cr, 1.0, 0.7, 0.7); 
+#define UPPER_MAX_MAX_COLOR cairo_set_source_rgb(cr, 1.0, 0.0, 1.0);
+#define UPPER_MAX_COLOR cairo_set_source_rgb(cr, 1.0, 0.7, 0.7);
 
 #define RED 1
 #define YELLOW 2
 #define WHITE 3
 #define G_OFF 4
-#define G_OFF1 4	// bar horizontal offset
+#define G_OFF1 4 // bar horizontal offset
 #define UPPER 0
 #define LOWER 1
 
@@ -410,228 +444,279 @@ float UPPER_MAX_MAX = DRAW_HEIGHT - DRAW_HEIGHT / 20.0;
 //
 //----------------------------------------------------
 
-gboolean on_draw1_draw (GtkDrawingArea *widget, cairo_t *cr) {
+gboolean
+on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
+{
 
-	int noLine = 0;
+  int noLine = 0;
 
-	if (no_graph) return FALSE;
+  if (no_graph)
+    return FALSE;
 
-	if (style == NARROW_SPECTRUM || style == WIDE_SPECTRUM) {  
+  if (style == NARROW_SPECTRUM || style == WIDE_SPECTRUM)
+    {
 
-//------------------------
-//	frequency graph
-//------------------------
+      //------------------------
+      //	frequency graph
+      //------------------------
 
-		double blchan[100], brchan[100];
+      double blchan[100], brchan[100];
 
-		for (int i=0; i<100; i++) {blchan[i] = slchan[i]; brchan[i] = srchan[i]; }
+      for (int i = 0; i < 100; i++)
+        {
+          blchan[i] = slchan[i];
+          brchan[i] = srchan[i];
+        }
 
-		spectrum(); 	// scaling is done in spectrum()
-		noLine = 1; 
+      spectrum(); // scaling is done in spectrum()
+      noLine = 1;
 
-		double F;
+      double F;
 
-        	for (int i = 0; i < 99; i++) { // make bars less jumpy
+      for (int i = 0; i < 99; i++)
+        { // make bars less jumpy
 
-			slchan[i] = (slchan[i] + blchan[i]) / 2.0;	// left
-			srchan[i] = (srchan[i] + brchan[i]) / 2.0;	// right
+          slchan[i] = (slchan[i] + blchan[i]) / 2.0; // left
+          srchan[i] = (srchan[i] + brchan[i]) / 2.0; // right
+        }
+    }
 
-			}
-		}
+  //---------------------
+  //	volume graph
+  //---------------------
 
-//---------------------
-//	volume graph
-//---------------------
+  else
+    { // volume graph
+      if (super_bars)
+        for (int i = 0; i < 100; i++)
+          { // scale and segregate data
+            slchan[i] = lchan[i] * SCALE_BASELINE_VOLUME;
+            srchan[i] = rchan[i] * SCALE_BASELINE_VOLUME;
+          }
 
-	else {	// volume graph
-		if (super_bars) 
-			for (int i=0; i<100; i++) { // scale and segregate data
-				slchan[i] = lchan[i] * SCALE_BASELINE_VOLUME;
-				srchan[i] = rchan[i] * SCALE_BASELINE_VOLUME;
-				}
+      else
+        for (int i = 0; i < 100; i++)
+          { // segregate data unscaled
+            slchan[i] = lchan[i];
+            srchan[i] = rchan[i];
+          }
+    }
 
-		else for (int i=0; i<100; i++) { // segregate data unscaled
-				slchan[i] = lchan[i] ;
-				srchan[i] = rchan[i] ;
-				}
-		}
+  //------------------------
+  //	width of bars
+  //------------------------
 
-//------------------------
-//	width of bars
-//------------------------
+  cairo_set_line_width(cr, BAR_WIDTH1);
 
-        cairo_set_line_width(cr, BAR_WIDTH1);
+  for (int i = 0; i < 99; i++)
+    { // draw graph
 
-        for (int i = 0; i < 99; i++) { // draw graph
+      if ((!connect_graph || display_bars) && super_bars)
+        {
 
-			if ((!connect_graph || display_bars) && super_bars) { 
+          if (slchan[i] > srchan[i])
+            {                                                               // show prominent color
+              color_bars(cr, i, noLine, YELLOW);                            // left channel color
+              bar_graph(UPPER, slchan, i, cr, connect_graph, display_bars); // draw left channel only
+            }
+          else
+            {
+              color_bars(cr, i, noLine, RED);                               // right channel color
+              bar_graph(LOWER, srchan, i, cr, connect_graph, display_bars); // draw right channel only
+            }
+        }
 
-				if (slchan[i] > srchan[i] ) { // show prominent color
-					color_bars(cr, i, noLine, YELLOW);	// left channel color
-					bar_graph(UPPER, slchan, i, cr, connect_graph, display_bars); // draw left channel only
-					}
-				else {
-					color_bars(cr, i, noLine, RED);		// right channel color
-					bar_graph(LOWER, srchan, i, cr, connect_graph, display_bars); // draw right channel only
-					}
-				}
+      else
+        {
 
-			else { 
+          color_bars(cr, i, noLine, YELLOW); // left channel
+          bar_graph(UPPER, slchan, i, cr, connect_graph, display_bars);
 
-				color_bars(cr, i, noLine, YELLOW);	// left channel
-				bar_graph(UPPER, slchan, i, cr, connect_graph, display_bars);
-	
-				color_bars(cr, i, noLine, RED);		// right channel
-				bar_graph(LOWER, srchan, i, cr, connect_graph, display_bars);
-				}
-			}
+          color_bars(cr, i, noLine, RED); // right channel
+          bar_graph(LOWER, srchan, i, cr, connect_graph, display_bars);
+        }
+    }
 
-//-------------------------------------------------
-//	midpoint line - none if not centered graph
-//-------------------------------------------------
+  //-------------------------------------------------
+  //	midpoint line - none if not centered graph
+  //-------------------------------------------------
 
-	if (!super_bars) {	// mid point line of centered graph
-        	cairo_set_line_width(cr, 1.0);
-		cairo_set_source_rgb(cr, 0.0, 1.0, 0.0); // green
-		cairo_move_to (cr, (double) G_OFF - 2, DRAW_HEIGHT / 2.0 - 10.0 );
-		cairo_line_to (cr, (double) G_OFF + 394, DRAW_HEIGHT / 2.0 - 10.0 );
-		cairo_stroke (cr);
-		}
+  if (!super_bars)
+    { // mid point line of centered graph
+      cairo_set_line_width(cr, 1.0);
+      cairo_set_source_rgb(cr, 0.0, 1.0, 0.0); // green
+      cairo_move_to(cr, (double)G_OFF - 2, DRAW_HEIGHT / 2.0 - 10.0);
+      cairo_line_to(cr, (double)G_OFF + 394, DRAW_HEIGHT / 2.0 - 10.0);
+      cairo_stroke(cr);
+    }
 
-//---------------------------------
-//	frequency legend marks
-//---------------------------------
+  //---------------------------------
+  //	frequency legend marks
+  //---------------------------------
 
-	frequency_marks(cr);
+  frequency_marks(cr);
 
-//-----------------------------------------------------------------------------
-//	for future reference - not currently used
-//	guint width, height;
-//	width = gtk_widget_get_allocated_width (widget);   // of draw window
-//	height = gtk_widget_get_allocated_height (widget); // of draw window
-//-----------------------------------------------------------------------------
-
-	}
+  //-----------------------------------------------------------------------------
+  //	for future reference - not currently used
+  //	guint width, height;
+  //	width = gtk_widget_get_allocated_width (widget);   // of draw window
+  //	height = gtk_widget_get_allocated_height (widget); // of draw window
+  //-----------------------------------------------------------------------------
+}
 
 //--------------------------------
 //	Select color for bars
 //--------------------------------
 
-void	color_bars(cairo_t *cr, int i, int noLine, int color) {
+void
+color_bars(cairo_t* cr, int i, int noLine, int color)
+{
 
-	if ((style == WIDE_SPECTRUM || style == NARROW_SPECTRUM) && !super_bars) rand_colors = 1; 
-	else rand_colors = 0;
+  if ((style == WIDE_SPECTRUM || style == NARROW_SPECTRUM) && !super_bars)
+    rand_colors = 1;
+  else
+    rand_colors = 0;
 
-	if (!rand_colors ) {
-		if (!noLine && srchan[i] > UPPER_MAX_MAX) UPPER_MAX_MAX_COLOR
-		else if (!noLine && srchan[i] > UPPER_MAX) UPPER_MAX_COLOR
-               	else if (color == RED) cairo_set_source_rgb(cr, 1.0, 0.1, 0.1); // red
-		else if (color == YELLOW) cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
-		else if (color == WHITE) cairo_set_source_rgb(cr, 1.0, 1.0, 1.0); // white
-		else cairo_set_source_rgb(cr, 0.2, 0.2, 1.0); // blue
-		}
+  if (!rand_colors)
+    {
+      if (!noLine && srchan[i] > UPPER_MAX_MAX)
+        UPPER_MAX_MAX_COLOR
+      else if (!noLine && srchan[i] > UPPER_MAX)
+        UPPER_MAX_COLOR
+      else if (color == RED)
+        cairo_set_source_rgb(cr, 1.0, 0.1, 0.1); // red
+      else if (color == YELLOW)
+        cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+      else if (color == WHITE)
+        cairo_set_source_rgb(cr, 1.0, 1.0, 1.0); // white
+      else
+        cairo_set_source_rgb(cr, 0.2, 0.2, 1.0); // blue
+    }
 
-//--------------------------------------------------------------
-//	create a color from deep red up to violet depending on i
-//--------------------------------------------------------------
+  //--------------------------------------------------------------
+  //	create a color from deep red up to violet depending on i
+  //--------------------------------------------------------------
 
-	else  {
-		float r = (100 - i) / 100.0;
-		float b = (i) / 100.0 + 0.1;
-		float g;
+  else
+    {
+      float r = (100 - i) / 100.0;
+      float b = (i) / 100.0 + 0.1;
+      float g;
 
-		if (i == 0) g = 0.0;
-		else if (i == 50) g = 1.0;
-		else if (i < 50) g = (i % 50) / 50.0;
-		else g = ((100 - i) % 50) / 50.0;
+      if (i == 0)
+        g = 0.0;
+      else if (i == 50)
+        g = 1.0;
+      else if (i < 50)
+        g = (i % 50) / 50.0;
+      else
+        g = ((100 - i) % 50) / 50.0;
 
-		g = g + r/(30.0/i); 
-		r = r + b/(i/40.0); 
-		cairo_set_source_rgb(cr, r, g, b); 
-		}
-	}
+      g = g + r / (30.0 / i);
+      r = r + b / (i / 40.0);
+      cairo_set_source_rgb(cr, r, g, b);
+    }
+}
 
-
-
-#define G_MAX DRAW_HEIGHT / 2.0 - 10.0	// graph center line location (zero is top)
-#define G_MAX2 DRAW_HEIGHT - 20 	// graph center line location (zero is top)
-#define G_LIM DRAW_HEIGHT		// bar length limit
+#define G_MAX DRAW_HEIGHT / 2.0 - 10.0 // graph center line location (zero is top)
+#define G_MAX2 DRAW_HEIGHT - 20        // graph center line location (zero is top)
+#define G_LIM DRAW_HEIGHT              // bar length limit
 
 //------------------------------------------
 //	Process line (i) of the bar graph
 //------------------------------------------
 
-void	bar_graph(int lower, double chan[], int i, cairo_t *cr, int connect_graph, int display_bars) {
+void
+bar_graph(int lower, double chan[], int i, cairo_t* cr, int connect_graph, int display_bars)
+{
 
-	if (chan[i] > G_LIM) chan[i] = G_LIM;
-	if (chan[i+1] > G_LIM) chan[i+1] = G_LIM;
+  if (chan[i] > G_LIM)
+    chan[i] = G_LIM;
+  if (chan[i + 1] > G_LIM)
+    chan[i + 1] = G_LIM;
 
-        if ( connect_graph ) connecting_lines(cr, lower, i, chan);	// connecting horizontal graph lines
+  if (connect_graph)
+    connecting_lines(cr, lower, i, chan); // connecting horizontal graph lines
 
-        if (display_bars) draw_bars_only(cr, lower, i, chan);		// vertical bars
-
-	}
+  if (display_bars)
+    draw_bars_only(cr, lower, i, chan); // vertical bars
+}
 
 //-----------------------------
 //	draw vertical bars
 //-----------------------------
 
-void	draw_bars_only(cairo_t *cr, int lower, int i, double chan[]) {
+void
+draw_bars_only(cairo_t* cr, int lower, int i, double chan[])
+{
 
-	if (chan[i + 1] > 1.0 ) {
-		if (!super_bars) {	// centered
+  if (chan[i + 1] > 1.0)
+    {
+      if (!super_bars)
+        { // centered
 
-                       	if (lower) cairo_move_to (cr, (double) ((i * 4) + G_OFF), G_MAX + (double) chan[i]  );
-                       	else       cairo_move_to (cr, (double) ((i * 4) + G_OFF), G_MAX - (double) chan[i]  );
+          if (lower)
+            cairo_move_to(cr, (double)((i * 4) + G_OFF), G_MAX + (double)chan[i]);
+          else
+            cairo_move_to(cr, (double)((i * 4) + G_OFF), G_MAX - (double)chan[i]);
 
-                       	cairo_line_to (cr, (double) ((i * 4) + G_OFF), G_MAX ); // baseline line
-                       	cairo_stroke (cr);
-                        	}
-		else {			// not centered
-                       	cairo_move_to (cr, (double) ((i * 4) + G_OFF), G_MAX2 - (double) chan[i]  ); // horizontal, vertical
-                       	cairo_line_to (cr, (double) ((i * 4) + G_OFF), G_MAX2 ); // baseline line
-                       	cairo_stroke (cr);
-			}
-		}
-	}
+          cairo_line_to(cr, (double)((i * 4) + G_OFF), G_MAX); // baseline line
+          cairo_stroke(cr);
+        }
+      else
+        {                                                                         // not centered
+          cairo_move_to(cr, (double)((i * 4) + G_OFF), G_MAX2 - (double)chan[i]); // horizontal, vertical
+          cairo_line_to(cr, (double)((i * 4) + G_OFF), G_MAX2);                   // baseline line
+          cairo_stroke(cr);
+        }
+    }
+}
 
 //-------------------------------------------------
 //	draw connecting horizontal graph lines
 //-------------------------------------------------
 
-void	connecting_lines(cairo_t *cr, int lower, int i, double chan[]) {
+void
+connecting_lines(cairo_t* cr, int lower, int i, double chan[])
+{
 
-	if (i < 98) { // not at the end of the graph
+  if (i < 98)
+    { // not at the end of the graph
 
-		if (lower) { // below the centerline
+      if (lower)
+        { // below the centerline
 
+          if (!super_bars)
+            {                                                                                  // center line graph
+              cairo_move_to(cr, (double)((i * 4) + G_OFF1), G_MAX + (double)chan[i]);          // first bar
+              cairo_line_to(cr, (double)(((i + 1) * 4) + G_OFF), G_MAX + (double)chan[i + 1]); // second bar
+            }
 
-			if (!super_bars) { // center line graph
-				cairo_move_to (cr, (double) ((i * 4) + G_OFF1), G_MAX + (double) chan[i]  ); // first bar
-				cairo_line_to (cr, (double) (((i + 1) * 4) + G_OFF), G_MAX + (double) chan[i + 1] ); // second bar
-				}
+          else
+            {
+              cairo_move_to(cr, (double)((i * 4) + G_OFF1), G_MAX2 - (double)chan[i]);          // first bar
+              cairo_line_to(cr, (double)(((i + 1) * 4) + G_OFF), G_MAX2 - (double)chan[i + 1]); // second bar
+            }
+        }
 
-			else {
-                               	cairo_move_to (cr, (double) ((i * 4) + G_OFF1), G_MAX2 - (double) chan[i]  ); // first bar
-                               	cairo_line_to (cr, (double) (((i + 1) * 4) + G_OFF), G_MAX2 - (double) chan[i + 1] ); // second bar
-				}
-			}
+      else
+        { // above the center line
 
-		else { // above the center line
+          if (!super_bars)
+            {
+              cairo_move_to(cr, (double)((i * 4) + G_OFF1), G_MAX - (double)chan[i]);          // first
+              cairo_line_to(cr, (double)(((i + 1) * 4) + G_OFF), G_MAX - (double)chan[i + 1]); // second
+            }
+          else
+            {                                                                                   // not center line
+              cairo_move_to(cr, (double)((i * 4) + G_OFF1), G_MAX2 - (double)chan[i]);          // first
+              cairo_line_to(cr, (double)(((i + 1) * 4) + G_OFF), G_MAX2 - (double)chan[i + 1]); // second
+            }
+        }
 
-			if (!super_bars) {
-                               	cairo_move_to (cr, (double) ((i * 4) + G_OFF1), G_MAX - (double) chan[i]  ); // first
-                               	cairo_line_to (cr, (double) (((i + 1) * 4) + G_OFF), G_MAX - (double) chan[i + 1] ); // second
-				}
-			else { // not center line
-                               	cairo_move_to (cr, (double) ((i * 4) + G_OFF1), G_MAX2 - (double) chan[i]  ); // first
-                               	cairo_line_to (cr, (double) (((i + 1) * 4) + G_OFF), G_MAX2 - (double) chan[i + 1] ); // second
-				}
-			}
-
-		cairo_stroke (cr); // do it
-		}
-	}
+      cairo_stroke(cr); // do it
+    }
+}
 
 //-----------------------------
 //
@@ -639,190 +724,241 @@ void	connecting_lines(cairo_t *cr, int lower, int i, double chan[]) {
 //
 //-----------------------------
 
-gboolean on_draw2_draw (GtkDrawingArea *widget, cairo_t *cr) {
+gboolean
+on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
+{
 
-	double hor, ver, t1, len;
+  double hor, ver, t1, len;
 
-	int noLine = 0;
+  int noLine = 0;
 
-	if (no_meters) return FALSE;
+  if (no_meters)
+    return FALSE;
 
 #define MHOR 55.0
 
-//----------------------------------------------
-//	average the past X to dampen movement
-//----------------------------------------------
+  //----------------------------------------------
+  //	average the past X to dampen movement
+  //----------------------------------------------
 
-//	Lx = (lchan[0] + lchan[1] + lchan[2] + lchan[3] ) / 4.0;
-//	Rx = (rchan[0] + rchan[1] + rchan[2] + rchan[3] ) / 4.0;
+  //	Lx = (lchan[0] + lchan[1] + lchan[2] + lchan[3] ) / 4.0;
+  //	Rx = (rchan[0] + rchan[1] + rchan[2] + rchan[3] ) / 4.0;
 
-//	Lx = (lchan[0] + lchan[1] + lchan[2] ) / 3.0;
-//	Rx = (rchan[0] + rchan[1] + rchan[2] ) / 3.0;
+  //	Lx = (lchan[0] + lchan[1] + lchan[2] ) / 3.0;
+  //	Rx = (rchan[0] + rchan[1] + rchan[2] ) / 3.0;
 
-	Lx = (lchan[0] + lchan[1] ) / 2.0;
-	Rx = (rchan[0] + rchan[1] ) / 2.0;
+  Lx = (lchan[0] + lchan[1]) / 2.0;
+  Rx = (rchan[0] + rchan[1]) / 2.0;
 
-//	Lx = lchan[0];
-//	Rx = rchan[0];
+  //	Lx = lchan[0];
+  //	Rx = rchan[0];
 
 #define DECAY_FACTOR 250.0
 
-//--------------------------------
-//	LEFT Channel meter
-//--------------------------------
+  //--------------------------------
+  //	LEFT Channel meter
+  //--------------------------------
 
-	if (Lx > CLIP_LEVEL) {
-		L_Clipping = 1;
-		Lx = 99.0;
-		}
+  if (Lx > CLIP_LEVEL)
+    {
+      L_Clipping = 1;
+      Lx = 99.0;
+    }
 
-	else L_Clipping = 0;
+  else
+    L_Clipping = 0;
 
-	t1 = (Lx / 100.0) * M_PI;
+  t1 = (Lx / 100.0) * M_PI;
 
-	if (t1 < 0.1) MaxLM = 0.0;
+  if (t1 < 0.1)
+    MaxLM = 0.0;
 
-        else if (t1 > MaxLM) { MaxLM = t1; }
+  else if (t1 > MaxLM)
+    {
+      MaxLM = t1;
+    }
 
-        else { if (MaxLM > 0.0) MaxLM = MaxLM - MaxLM / DECAY_FACTOR; }
+  else
+    {
+      if (MaxLM > 0.0)
+        MaxLM = MaxLM - MaxLM / DECAY_FACTOR;
+    }
 
-//.............................
+  //.............................
 
-	MaxL[MLr++] = t1 * t1; if (MLr == RMX ) MLr = 0;
+  MaxL[MLr++] = t1 * t1;
+  if (MLr == RMX)
+    MLr = 0;
 
-	double Avg = 0.0;
+  double Avg = 0.0;
 
-	for (int i = 0; i < RMX; i++) Avg += MaxL[i];
+  for (int i = 0; i < RMX; i++)
+    Avg += MaxL[i];
 
-//------------------------------------------------------
-//	position of origin point and length of needle:
-//------------------------------------------------------
+  //------------------------------------------------------
+  //	position of origin point and length of needle:
+  //------------------------------------------------------
 
-	if (legacy_vumeters) {
-		hor = MHOR + 44.;
-		ver = 62.0; 
-		len = 80.0;
-        	needles(cr, hor, ver, len, t1, MaxLM, 0, sqrtf(Avg / RMX));
-		}
-	else {
-		hor = MHOR; 
-		ver = 50.0; 
-		len = 30.0;
-        	needles(cr, hor, ver, len, t1, MaxLM, 1, sqrtf(Avg / RMX));
-		}
+  if (legacy_vumeters)
+    {
+      hor = MHOR + 44.;
+      ver = 62.0;
+      len = 80.0;
+      needles(cr, hor, ver, len, t1, MaxLM, 0, sqrtf(Avg / RMX));
+    }
+  else
+    {
+      hor = MHOR;
+      ver = 50.0;
+      len = 30.0;
+      needles(cr, hor, ver, len, t1, MaxLM, 1, sqrtf(Avg / RMX));
+    }
 
+  if (legacy_vumeters)
+    cairo_move_to(cr, hor - 9.0, ver - 2.0); // top
+  else
+    cairo_move_to(cr, hor - 10.0, ver + 15.0); // top
 
-	if (legacy_vumeters) cairo_move_to (cr, hor - 9.0, ver - 2.0 ); // top
-	else cairo_move_to (cr, hor - 10.0, ver + 15.0 ); // top
+  if (L_Clipping)
+    cairo_show_text(cr, "Peak");
+  else
+    cairo_show_text(cr, "Left");
+  cairo_stroke(cr);
 
-	if (L_Clipping) cairo_show_text(cr, "Peak");
-	else cairo_show_text(cr, "Left");
-	cairo_stroke (cr);
+  //--------------------------------
+  //	RIGHT Channel meter
+  //--------------------------------
 
-//--------------------------------
-//	RIGHT Channel meter
-//--------------------------------
+  if (Rx > CLIP_LEVEL)
+    {
+      R_Clipping = 1;
+      Rx = 99.0;
+    }
 
-	if (Rx > CLIP_LEVEL) {
-		R_Clipping = 1;
-		Rx = 99.0;
-		}
+  else
+    R_Clipping = 0;
 
-	else R_Clipping = 0;
+  t1 = (Rx / 100.0) * M_PI;
 
-	t1 = (Rx / 100.0) * M_PI;
+  if (t1 < 0.1)
+    MaxRM = 0.;
 
-	if (t1 < 0.1) MaxRM = 0.;
+  else if (t1 > MaxRM)
+    {
+      MaxRM = t1;
+    }
+  else
+    {
+      if (MaxRM > 0.0)
+        MaxRM = MaxRM - MaxRM / DECAY_FACTOR;
+    }
 
-        else if (t1 > MaxRM) {
-                MaxRM = t1;
-                }
-        else {
-                if (MaxRM > 0.0) MaxRM = MaxRM - MaxRM / DECAY_FACTOR;
-                }
+  MaxR[MRr++] = t1 * t1;
+  if (MRr == RMX)
+    MRr = 0;
 
-	MaxR[MRr++] = t1 * t1; if (MRr == RMX ) MRr = 0;
+  Avg = 0.0;
 
-	Avg = 0.0;
+  for (int i = 0; i < RMX; i++)
+    Avg += MaxR[i];
 
-	for (int i = 0; i < RMX; i++) Avg += MaxR[i];
+  if (legacy_vumeters)
+    {
+      hor = MHOR + 240;
+      needles(cr, hor, ver, len, t1, MaxLM, 0, sqrtf(Avg / RMX));
+    }
+  else
+    {
+      hor = MHOR + 180;
+      needles(cr, hor, ver, len, t1, MaxRM, 2, sqrtf(Avg / RMX));
+    }
 
-	if (legacy_vumeters) {
-		hor = MHOR + 240;
-        	needles(cr, hor, ver, len, t1, MaxLM, 0, sqrtf(Avg / RMX));
-		}
-	else {
-		hor = MHOR + 180;
-        	needles(cr, hor, ver, len, t1, MaxRM, 2, sqrtf(Avg / RMX));
-		}
+  if (legacy_vumeters)
+    cairo_move_to(cr, hor - 12.0, ver - 2.0); // top
+  else
+    cairo_move_to(cr, hor - 14.0, ver + 15.0); // top
 
+  if (R_Clipping)
+    cairo_show_text(cr, "Peak");
+  else
+    cairo_show_text(cr, "Right");
+  cairo_stroke(cr);
 
-	if (legacy_vumeters) cairo_move_to (cr, hor - 12.0, ver - 2.0 ); // top
-	else cairo_move_to (cr, hor - 14.0, ver + 15.0 ); // top
+  //----------------------------------------------------------
+  //	microphone meter
+  //----------------------------------------------------------
 
-	if (R_Clipping) cairo_show_text(cr, "Peak");
-	else cairo_show_text(cr, "Right");
-	cairo_stroke (cr);
+  MRx = MLx = 0.0; // start a new sample - this one has been used.
 
-//----------------------------------------------------------
-//	microphone meter
-//----------------------------------------------------------
+  if (ML > CLIP_LEVEL)
+    ML = 99.0; // limit
 
-	MRx = MLx = 0.0;	// start a new sample - this one has been used.
+  t1 = (ML / 100.0) * M_PI; // fraction of PI
 
-	if (ML > CLIP_LEVEL) ML = 99.0;	// limit
+  if (t1 < 0.1)
+    MaxMM = 0.;
 
-	t1 = (ML / 100.0) * M_PI;	// fraction of PI
+  else if (t1 > MaxMM)
+    {
+      MaxMM = t1;
+    }
+  else
+    {
+      if (MaxMM > 0.0)
+        MaxMM = MaxMM - MaxMM / DECAY_FACTOR;
+    }
 
-	if (t1 < 0.1) MaxMM = 0.;
+  MaxM[MMr++] = t1 * t1;
+  if (MMr == RMX)
+    MMr = 0;
 
-        else if (t1 > MaxMM) {
-                MaxMM = t1;
-                }
-        else {
-                if (MaxMM > 0.0) MaxMM = MaxMM - MaxMM / DECAY_FACTOR;
-                }
+  Avg = 0.0;
 
-	MaxM[MMr++] = t1 * t1; if (MMr == RMX ) MMr = 0;
+  for (int i = 0; i < RMX; i++)
+    Avg += MaxM[i];
 
-	Avg = 0.0;
+  if (legacy_vumeters)
+    {
+      hor = MHOR + 438;
+      needles(cr, hor, ver, len, t1, MaxLM, 0, sqrtf(Avg / RMX));
+    }
+  else
+    {
+      hor = 340.0;
+      needles(cr, hor, ver, len, t1, MaxMM, 3, sqrtf(Avg / RMX));
+    }
 
-	for (int i = 0; i < RMX; i++) Avg += MaxM[i];
+  if (legacy_vumeters)
+    cairo_move_to(cr, hor - 30.0, ver - 2.0); // top
+  else
+    cairo_move_to(cr, hor - 30.0, ver + 15.0); // top
 
-	if (legacy_vumeters) {
-		hor = MHOR + 438;
-        	needles(cr, hor, ver, len, t1, MaxLM, 0, sqrtf(Avg / RMX));
-		}
-	else {
-		hor = 340.0; 
-		needles(cr, hor, ver, len, t1, MaxMM, 3, sqrtf(Avg / RMX));
-		}
+  cairo_show_text(cr, "Microphone");
+  cairo_stroke(cr);
 
-	if (legacy_vumeters) cairo_move_to (cr, hor - 30.0, ver - 2.0 ); // top
-	else cairo_move_to (cr, hor - 30.0, ver + 15.0 ); // top
+  //--------------------------
+  // 	balance meter
+  //--------------------------
 
-	cairo_show_text(cr, "Microphone");
-	cairo_stroke (cr);
+  if (legacy_vumeters)
+    return FALSE;
 
-//--------------------------
-// 	balance meter
-//--------------------------
+  hor = MHOR + 90;
+  len = 30.0;
 
-	if (legacy_vumeters) return FALSE;
+  Balance = 50.0 + 2.0 * (Rx - Lx); // difference & double the effect
 
-	hor = MHOR + 90; len = 30.0;
+  if (Balance > 99.0)
+    Balance = 99.0;
+  if (Balance < 0.0)
+    Balance = 0.0;
+  t1 = (Balance / 100.0) * M_PI;
 
-	Balance = 50.0 + 2.0 * (Rx - Lx);	// difference & double the effect
+  needles(cr, hor, ver, len, t1, 0, 4, 0.0);
 
-	if (Balance > 99.0 ) Balance = 99.0;
-	if (Balance < 0.0) Balance = 0.0;
-	t1 = (Balance / 100.0) * M_PI;
-
-        needles(cr, hor, ver, len, t1, 0, 4, 0.0);
-
-	cairo_move_to (cr, hor - 18., ver + 15.0 ); // top
-	cairo_show_text(cr, "Balance");
-	cairo_stroke (cr);
+  cairo_move_to(cr, hor - 18., ver + 15.0); // top
+  cairo_show_text(cr, "Balance");
+  cairo_stroke(cr);
 
 #define HOR_ORIGIN 32.0
 #define VER_ORIGIN 78.0
@@ -830,299 +966,332 @@ gboolean on_draw2_draw (GtkDrawingArea *widget, cairo_t *cr) {
 #define LINE_WIDTH 5
 #define LINE_SEP 4.0
 
-	return FALSE; // NO BARS
-	cairo_set_line_width(cr, LINE_WIDTH);
+  return FALSE; // NO BARS
+  cairo_set_line_width(cr, LINE_WIDTH);
 
-//-------------------------
-//	media clipping
-//-------------------------
+  //-------------------------
+  //	media clipping
+  //-------------------------
 
-	if (L_Clipping) { // display text
+  if (L_Clipping)
+    { // display text
 
-        	cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
+      cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
 
-		cairo_move_to (cr, HOR_ORIGIN - 30, VER_ORIGIN + 3 ); // top
+      cairo_move_to(cr, HOR_ORIGIN - 30, VER_ORIGIN + 3); // top
 
-		cairo_show_text(cr, "Peak");
-		cairo_stroke (cr);
-		}
+      cairo_show_text(cr, "Peak");
+      cairo_stroke(cr);
+    }
 
-	if (R_Clipping) { // display text
+  if (R_Clipping)
+    { // display text
 
-        	cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); // red
+      cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); // red
 
-		cairo_move_to (cr, HOR_ORIGIN - 30, VER_ORIGIN + LINE_WIDTH + LINE_SEP + 5 ); // top
+      cairo_move_to(cr, HOR_ORIGIN - 30, VER_ORIGIN + LINE_WIDTH + LINE_SEP + 5); // top
 
-		cairo_show_text(cr, "Peak");
-		cairo_stroke (cr);
-		}
+      cairo_show_text(cr, "Peak");
+      cairo_stroke(cr);
+    }
 
-//---------------------
-//	level bars
-//---------------------
+  //---------------------
+  //	level bars
+  //---------------------
 
-        	double left_bar;
+  double left_bar;
 
-		left_bar = BAR_WIDTH * Lx;	// bar length
-	
-        	double right_bar;
+  left_bar = BAR_WIDTH * Lx; // bar length
 
-		right_bar = BAR_WIDTH * Rx;	// bar length
-	
-        	cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
-	
-        	cairo_move_to(cr, HOR_ORIGIN, VER_ORIGIN);
-        	cairo_line_to (cr, left_bar + HOR_ORIGIN, VER_ORIGIN );
-        	cairo_stroke (cr);
-	
-        	cairo_set_source_rgb(cr, 1.0, 0.0, 0.); // red
-	
-        	cairo_move_to(cr, HOR_ORIGIN, VER_ORIGIN + LINE_WIDTH + LINE_SEP); 
-        	cairo_line_to (cr, right_bar + HOR_ORIGIN, VER_ORIGIN + LINE_WIDTH + LINE_SEP );
-        	cairo_stroke (cr);
+  double right_bar;
 
-//---------------------
-// 	microphone bar
-//---------------------
+  right_bar = BAR_WIDTH * Rx; // bar length
 
-	static double mic_bar;
-	mic_bar =  BAR_WIDTH * ML; 
+  cairo_set_source_rgb(cr, 1.0, 1.0, 0.3); // yellow
 
-	cairo_set_line_width(cr, LINE_WIDTH);
+  cairo_move_to(cr, HOR_ORIGIN, VER_ORIGIN);
+  cairo_line_to(cr, left_bar + HOR_ORIGIN, VER_ORIGIN);
+  cairo_stroke(cr);
 
-       	if (ML < 95.0) cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
+  cairo_set_source_rgb(cr, 1.0, 0.0, 0.); // red
 
-       	else { // clipping
+  cairo_move_to(cr, HOR_ORIGIN, VER_ORIGIN + LINE_WIDTH + LINE_SEP);
+  cairo_line_to(cr, right_bar + HOR_ORIGIN, VER_ORIGIN + LINE_WIDTH + LINE_SEP);
+  cairo_stroke(cr);
 
-       		cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
-		cairo_move_to (cr, HOR_ORIGIN - 25, VER_ORIGIN + 2 * LINE_WIDTH + 2 * LINE_SEP + 4 ); // top
-		cairo_show_text(cr, "Peak");
-		cairo_stroke (cr);
+  //---------------------
+  // 	microphone bar
+  //---------------------
 
-		cairo_set_source_rgb(cr, 0.9, 0.5, 1.0); // pink
+  static double mic_bar;
+  mic_bar = BAR_WIDTH * ML;
 
-		}
+  cairo_set_line_width(cr, LINE_WIDTH);
 
-	MR = ML = 0.0;
-	
-       	cairo_move_to(cr, HOR_ORIGIN, VER_ORIGIN + 2 * LINE_WIDTH + 2 * LINE_SEP); 
-       	cairo_line_to (cr, mic_bar + HOR_ORIGIN, VER_ORIGIN + 2 * LINE_WIDTH + 2 * LINE_SEP );
-       	cairo_stroke (cr);
+  if (ML < 95.0)
+    cairo_set_source_rgb(cr, 0.5, 1.0, 0.5); // green
 
-	return FALSE;
-	}
+  else
+    { // clipping
+
+      cairo_set_source_rgb(cr, 0.5, 1.0, 0.5);                                            // green
+      cairo_move_to(cr, HOR_ORIGIN - 25, VER_ORIGIN + 2 * LINE_WIDTH + 2 * LINE_SEP + 4); // top
+      cairo_show_text(cr, "Peak");
+      cairo_stroke(cr);
+
+      cairo_set_source_rgb(cr, 0.9, 0.5, 1.0); // pink
+    }
+
+  MR = ML = 0.0;
+
+  cairo_move_to(cr, HOR_ORIGIN, VER_ORIGIN + 2 * LINE_WIDTH + 2 * LINE_SEP);
+  cairo_line_to(cr, mic_bar + HOR_ORIGIN, VER_ORIGIN + 2 * LINE_WIDTH + 2 * LINE_SEP);
+  cairo_stroke(cr);
+
+  return FALSE;
+}
 
 //--------------------------------------------------
 //	frequency spectrum service function
 //--------------------------------------------------
 
 #define WindowWidth 200
-	int width = WindowWidth;     // two times the display window - half left, half right
-	int numBars = WindowWidth /2;
+int width = WindowWidth; // two times the display window - half left, half right
+int numBars = WindowWidth / 2;
 
 int maxHeight = 100; // display window max from midpoint
 
-void	fftTobars(fftw_complex *fft, int size, int *bars) {
+void
+fftTobars(fftw_complex* fft, int size, int* bars)
+{
 
-	double strength, real, imagin, scale;
-	int amplitude, i, j, bar, incr;
+  double strength, real, imagin, scale;
+  int amplitude, i, j, bar, incr;
 
-	scale = 0.0003;
+  scale = 0.0003;
 
-	i = 0; // fft index
+  i = 0; // fft index
 
-	for (bar = 0; bar < numBars; bar++) { // average for each bar
+  for (bar = 0; bar < numBars; bar++)
+    { // average for each bar
 
-		real = fft[i][0] * scale;
-		imagin = fft[i][1] * scale;
-		strength = real * real + imagin * imagin; 
-		i++;
+      real = fft[i][0] * scale;
+      imagin = fft[i][1] * scale;
+      strength = real * real + imagin * imagin;
+      i++;
 
-		if (strength < 1.00e-10) strength = 1.00e-10; // prevent overflows.
+      if (strength < 1.00e-10)
+        strength = 1.00e-10; // prevent overflows.
 
-		amplitude = (maxHeight + (int) (10.0 * log10(strength))) * 2.0;
+      amplitude = (maxHeight + (int)(10.0 * log10(strength))) * 2.0;
 
-		if (amplitude > maxHeight) amplitude = maxHeight;
-		if (amplitude < 0) amplitude = 0;
+      if (amplitude > maxHeight)
+        amplitude = maxHeight;
+      if (amplitude < 0)
+        amplitude = 0;
 
-		bars[bar] = amplitude;
+      bars[bar] = amplitude;
 
-		if (spectrum_width == 1 ) {
-			bar++;
-	 		bars[bar] = amplitude; // double up
- 			}
-		}
-	}
+      if (spectrum_width == 1)
+        {
+          bar++;
+          bars[bar] = amplitude; // double up
+        }
+    }
+}
 
 //------------------------------------------------------
 //	Calculate frequency spectrum array
 //------------------------------------------------------
 
-void	spectrum() {
+void
+spectrum()
+{
 
-	int size = SAMPLE_SIZE/2;
+  int size = SAMPLE_SIZE / 2;
 
-	static float *Hann = NULL;
-	float buffer[sampSpec.channels * size];
-	static double *in = NULL;
-	static fftw_complex *out = NULL;
+  static float* Hann = NULL;
+  float buffer[sampSpec.channels * size];
+  static double* in = NULL;
+  static fftw_complex* out = NULL;
 
-	in = (double*) fftw_malloc(sizeof(double) * size);
-	out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * size);
+  in = (double*)fftw_malloc(sizeof(double) * size);
+  out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * size);
 
-	if (! Hann) { // used to perform Hann smoothing
+  if (!Hann)
+    { // used to perform Hann smoothing
 
-		Hann = (float*) malloc(sizeof(float)*size);
+      Hann = (float*)malloc(sizeof(float) * size);
 
-		for(int n = 0; n < size; n++)  { 
-			Hann[n] = 0.5 * (1.0 - cos(2.0 * M_PI * n / (size - 1.0))) ; 
-			}
+      for (int n = 0; n < size; n++)
+        {
+          Hann[n] = 0.5 * (1.0 - cos(2.0 * M_PI * n / (size - 1.0)));
+        }
+    }
 
-		}
+  //	fftw_plan plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_MEASURE); // alternates
+  //	fftw_plan plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_PATIENT);
 
-//	fftw_plan plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_MEASURE); // alternates
-//	fftw_plan plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_PATIENT);
+  fftw_plan plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_ESTIMATE);
 
-	fftw_plan plan = fftw_plan_dft_r2c_1d(size, in, out, FFTW_ESTIMATE);
+  int barsL[width / 2], barsR[width / 2];
 
-	int barsL[width / 2], barsR[width / 2];
+  //	------------
+  //	left channel
+  //	------------
 
-//	------------
-//	left channel
-//	------------
+  //	for (int i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2]; // every other element
 
-//	for (int i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2]; // every other element
+  for (int i = 0; i < size; i++)
+    in[i] = Hann[i] * exchangeBuf[i * 2]; // every other element
 
-	for (int i=0; i<size; i++) in[i] = Hann[i] * exchangeBuf[i * 2]; // every other element
+  //	for(int i = 0; i < size; i++) in[i] = Hann[i] * buffer[i];
 
-//	for(int i = 0; i < size; i++) in[i] = Hann[i] * buffer[i];
+  fftw_execute(plan);
 
-	fftw_execute(plan);
+  fftTobars(out, size, barsL);
 
-	fftTobars(out, size, barsL);
+  double F = 1.0;
 
-	double F = 1.0;
-		
-	for (int i = 0; i < width / 2; i++) { 
-		if (barsL[i] < 0.0 ) slchan[i] = 0.0;
-		else {
-			if (super_bars) {
-				barsL[i] *= F; F += 0.02;
-				slchan[i] = barsL[i] * SCALE_BASELINE_SPECTRUM; 
-				}
-			else {
-				barsL[i] *= F; F += 0.01;
-				slchan[i] = barsL[i] * SCALE_MIDLINE_SPECTRUM; 
-				}
-			if (slchan[i] > SPECTRUM_PEAK) slchan[i] = SPECTRUM_PEAK; 
-//			else if (slchan[i] < 0.0) slchan[i] = 0.0;
-			}
-		}
-		
-//	-------------
-//	right channel
-//	-------------
+  for (int i = 0; i < width / 2; i++)
+    {
+      if (barsL[i] < 0.0)
+        slchan[i] = 0.0;
+      else
+        {
+          if (super_bars)
+            {
+              barsL[i] *= F;
+              F += 0.02;
+              slchan[i] = barsL[i] * SCALE_BASELINE_SPECTRUM;
+            }
+          else
+            {
+              barsL[i] *= F;
+              F += 0.01;
+              slchan[i] = barsL[i] * SCALE_MIDLINE_SPECTRUM;
+            }
+          if (slchan[i] > SPECTRUM_PEAK)
+            slchan[i] = SPECTRUM_PEAK;
+          //			else if (slchan[i] < 0.0) slchan[i] = 0.0;
+        }
+    }
 
-//	for (int i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2 + 1]; // every other element
+  //	-------------
+  //	right channel
+  //	-------------
 
-	for (int i=0; i<size; i++) in[i] = Hann[i] * exchangeBuf[i * 2 + 1]; // every other element
+  //	for (int i=0; i<size; i++) buffer[i] = exchangeBuf[i * 2 + 1]; // every other element
 
-//	for(int i = 0; i < size; i++) in[i] = Hann[i] * buffer[i];
+  for (int i = 0; i < size; i++)
+    in[i] = Hann[i] * exchangeBuf[i * 2 + 1]; // every other element
 
-	fftw_execute(plan);
-	fftTobars(out, size, barsR);
+  //	for(int i = 0; i < size; i++) in[i] = Hann[i] * buffer[i];
 
-	F = 1.0;
-	for (int i=0; i<width/2; i++) { 
-		if (barsR[i] < 0.0) srchan[i] = 0.0;
-		else {
-			if (super_bars) {
-				barsR[i] *= F; F += 0.02;
-				srchan[i] = barsR[i] * SCALE_BASELINE_SPECTRUM; 
-				}
-			else {
-				barsR[i] *= F; F += 0.01;
-				srchan[i] = barsR[i] * SCALE_MIDLINE_SPECTRUM; 
-				}
-			if (srchan[i] > SPECTRUM_PEAK) srchan[i] = SPECTRUM_PEAK;
-//			else if (srchan[i] < 0.0) srchan[i] = 0.0;
-			}
-		}
+  fftw_execute(plan);
+  fftTobars(out, size, barsR);
 
-	fftw_free(in); 
-	fftw_free(out);
+  F = 1.0;
+  for (int i = 0; i < width / 2; i++)
+    {
+      if (barsR[i] < 0.0)
+        srchan[i] = 0.0;
+      else
+        {
+          if (super_bars)
+            {
+              barsR[i] *= F;
+              F += 0.02;
+              srchan[i] = barsR[i] * SCALE_BASELINE_SPECTRUM;
+            }
+          else
+            {
+              barsR[i] *= F;
+              F += 0.01;
+              srchan[i] = barsR[i] * SCALE_MIDLINE_SPECTRUM;
+            }
+          if (srchan[i] > SPECTRUM_PEAK)
+            srchan[i] = SPECTRUM_PEAK;
+          //			else if (srchan[i] < 0.0) srchan[i] = 0.0;
+        }
+    }
 
-	exchange = 0;
-	}
+  fftw_free(in);
+  fftw_free(out);
 
+  exchange = 0;
+}
 
-void	frequency_marks(cairo_t *cr) {
+void
+frequency_marks(cairo_t* cr)
+{
 
-// location of freq marks
+  // location of freq marks
 
 #define SPECTRUM_FREQ_VERTICAL DRAW_HEIGHT - 10
 
-	if (style == NARROW_SPECTRUM )  { // narrow
+  if (style == NARROW_SPECTRUM)
+    { // narrow
 
-		cairo_set_source_rgb(cr, 1.0, 1.0, 1.0); // white
+      cairo_set_source_rgb(cr, 1.0, 1.0, 1.0); // white
 
-		cairo_move_to (cr, 1.0, SPECTRUM_FREQ_VERTICAL ); // top
-		cairo_show_text(cr, "kHz");
-		cairo_stroke (cr);
+      cairo_move_to(cr, 1.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "kHz");
+      cairo_stroke(cr);
 
-		cairo_move_to (cr, 38.0, SPECTRUM_FREQ_VERTICAL ); // top
-		cairo_show_text(cr, "1");
-		cairo_stroke (cr);
+      cairo_move_to(cr, 38.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "1");
+      cairo_stroke(cr);
 
-		cairo_move_to (cr, 88.0, SPECTRUM_FREQ_VERTICAL ); // top
-		cairo_show_text(cr, "2.5");
-		cairo_stroke (cr);
+      cairo_move_to(cr, 88.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "2.5");
+      cairo_stroke(cr);
 
-		cairo_move_to (cr, 185.0, SPECTRUM_FREQ_VERTICAL ); // top
-		cairo_show_text(cr, "5");
-		cairo_stroke (cr);
+      cairo_move_to(cr, 185.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "5");
+      cairo_stroke(cr);
 
-		cairo_move_to (cr, 270.0, SPECTRUM_FREQ_VERTICAL ); // top
-		cairo_show_text(cr, "7.5");
-		cairo_stroke (cr);
+      cairo_move_to(cr, 270.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "7.5");
+      cairo_stroke(cr);
 
-		cairo_move_to (cr, 360.0, SPECTRUM_FREQ_VERTICAL ); // top
-		cairo_show_text(cr, "10");
-		cairo_stroke (cr);
+      cairo_move_to(cr, 360.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "10");
+      cairo_stroke(cr);
 
-		return;
-		}
+      return;
+    }
 
-	else if (style == WIDE_SPECTRUM) {
-               cairo_set_source_rgb(cr, 1.2, 1.2, 1.0); // gray
+  else if (style == WIDE_SPECTRUM)
+    {
+      cairo_set_source_rgb(cr, 1.2, 1.2, 1.0); // gray
 
-                cairo_move_to (cr, 1.0, SPECTRUM_FREQ_VERTICAL ); // top
-                cairo_show_text(cr, "kHz");
-                cairo_stroke (cr);
+      cairo_move_to(cr, 1.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "kHz");
+      cairo_stroke(cr);
 
-                cairo_move_to (cr, 40.0, SPECTRUM_FREQ_VERTICAL ); // top
-                cairo_show_text(cr, "2.5");
-                cairo_stroke (cr);
+      cairo_move_to(cr, 40.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "2.5");
+      cairo_stroke(cr);
 
-                cairo_move_to (cr, 88.0, SPECTRUM_FREQ_VERTICAL ); // top
-                cairo_show_text(cr, "5");
-                cairo_stroke (cr);
+      cairo_move_to(cr, 88.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "5");
+      cairo_stroke(cr);
 
-                cairo_move_to (cr, 130.0, SPECTRUM_FREQ_VERTICAL ); // top
-                cairo_show_text(cr, "7.5");
-                cairo_stroke (cr);
+      cairo_move_to(cr, 130.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "7.5");
+      cairo_stroke(cr);
 
-                cairo_move_to (cr, 176.0, SPECTRUM_FREQ_VERTICAL ); // top
-                cairo_show_text(cr, "10");
-                cairo_stroke (cr);
+      cairo_move_to(cr, 176.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "10");
+      cairo_stroke(cr);
 
-                cairo_move_to (cr, 270.0, SPECTRUM_FREQ_VERTICAL ); // top
-                cairo_show_text(cr, "15");
-                cairo_stroke (cr);
+      cairo_move_to(cr, 270.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "15");
+      cairo_stroke(cr);
 
-                cairo_move_to (cr, 360.0, SPECTRUM_FREQ_VERTICAL ); // top
-                cairo_show_text(cr, "20");
-                cairo_stroke (cr);
-
-		}
-	}
+      cairo_move_to(cr, 360.0, SPECTRUM_FREQ_VERTICAL); // top
+      cairo_show_text(cr, "20");
+      cairo_stroke(cr);
+    }
+}

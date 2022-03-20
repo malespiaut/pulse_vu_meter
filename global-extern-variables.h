@@ -27,31 +27,31 @@
 
 // August 14, 2021
 
-extern int	display_bars;
+extern int display_bars;
 
-extern pa_glib_mainloop        *m_sink;        // internal audio - sink
-extern pa_glib_mainloop        *m_source;      // pulse audio microphone - source
+extern pa_glib_mainloop* m_sink;   // internal audio - sink
+extern pa_glib_mainloop* m_source; // pulse audio microphone - source
 
-extern pa_context       *context_source;
-extern pa_context       *context_sink;
-extern pa_stream        *stream_sink;
-extern pa_stream        *stream_source;
-extern char             *device_name_source;
-extern char             *device_name_sink;
-extern char             *device_description_source;
-extern char             *device_description_sink;
+extern pa_context* context_source;
+extern pa_context* context_sink;
+extern pa_stream* stream_sink;
+extern pa_stream* stream_source;
+extern char* device_name_source;
+extern char* device_name_sink;
+extern char* device_description_source;
+extern char* device_description_sink;
 
-extern GtkWidget       *window;
-extern GtkWidget       *fixed1;
-extern GtkWidget       *draw1;
-extern GtkWidget       *draw2;
-extern GtkWidget       *Bars;
-extern GtkWidget       *Spectrum;
-extern GtkWidget       *meters;
-extern GtkWidget       *balance;
-extern GtkBuilder      *builder;
+extern GtkWidget* window;
+extern GtkWidget* fixed1;
+extern GtkWidget* draw1;
+extern GtkWidget* draw2;
+extern GtkWidget* Bars;
+extern GtkWidget* Spectrum;
+extern GtkWidget* meters;
+extern GtkWidget* balance;
+extern GtkBuilder* builder;
 
-extern int samp1,samp2;
+extern int samp1, samp2;
 extern int showArc;
 extern int showB2;
 extern int connect_graph; // whether to connect the bar graph bars
@@ -66,33 +66,32 @@ extern int no_meters;
 extern int LAT;
 extern int rand_colors;
 extern char bg_color[256];
-extern int  L_Clipping, R_Clipping;
-extern int  style;
+extern int L_Clipping, R_Clipping;
+extern int style;
 
-extern void                    bar_graph(int lower, double[], int, cairo_t *, int, int);
-extern void                    color_bars(cairo_t *cr, int, int, int);
-extern void                    frequency_marks(cairo_t *);
-extern void                    draw_bars_only(cairo_t *cr, int lower, int i, double chan[]);
-extern void                    connecting_lines(cairo_t *, int , int , double []);
-extern gboolean                on_draw1_draw (GtkDrawingArea *, cairo_t *) ;
-extern gboolean                on_draw2_draw (GtkDrawingArea *widget, cairo_t *cr);
-extern int                     style; // narrow
-extern double                  FACTOR, LeftChan, RightChan, Lx, Rx;
-extern double                  rUtil, srchan[100], rchan[100];
-extern double                  lUtil, slchan[100], lchan[100];
-extern char                    default_source[1024];
-extern char                    default_sink[1024];
-extern int                     no_microphone;
-extern float                   exchangeBuf[SAMPLE_SIZE];
-extern int                     exchange;
-extern int                     sink_channels, source_channels;
-extern int                     super_bars;         // bars above graphs
+extern void bar_graph(int lower, double[], int, cairo_t*, int, int);
+extern void color_bars(cairo_t* cr, int, int, int);
+extern void frequency_marks(cairo_t*);
+extern void draw_bars_only(cairo_t* cr, int lower, int i, double chan[]);
+extern void connecting_lines(cairo_t*, int, int, double[]);
+extern gboolean on_draw1_draw(GtkDrawingArea*, cairo_t*);
+extern gboolean on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr);
+extern int style; // narrow
+extern double FACTOR, LeftChan, RightChan, Lx, Rx;
+extern double rUtil, srchan[100], rchan[100];
+extern double lUtil, slchan[100], lchan[100];
+extern char default_source[1024];
+extern char default_sink[1024];
+extern int no_microphone;
+extern float exchangeBuf[SAMPLE_SIZE];
+extern int exchange;
+extern int sink_channels, source_channels;
+extern int super_bars; // bars above graphs
 
 #define RMX 5
-extern double                  MaxR[RMX], MaxL[RMX], MaxM[RMX];
-extern double                  MaxRM, MaxLM, MaxMM;
-extern int                     MRr, MLr, MMr;
+extern double MaxR[RMX], MaxL[RMX], MaxM[RMX];
+extern double MaxRM, MaxLM, MaxMM;
+extern int MRr, MLr, MMr;
 
-extern double                  ML, MR, Balance;
-extern double                  MLx, MRx;
-
+extern double ML, MR, Balance;
+extern double MLx, MRx;
