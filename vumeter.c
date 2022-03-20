@@ -143,14 +143,13 @@ main(int argc, char* argv[])
 
   gtk_widget_show(window);
 
-  GdkColor color; // default background color
-
-  if (!gdk_color_parse(bg_color, &color))
-    { // does color parse?
-      color.blue = 0x0000;
-      color.red = 0x0000;
-      color.green = 0x0000;
-    }
+  // GdkColor color; // default background color
+  GdkRGBA color = {
+    .red = 0.0,
+    .green = 0.0,
+    .blue = 0.0,
+    .alpha = 1.0
+  };
 
   gtk_widget_modify_bg(window, GTK_STATE_NORMAL, &color); // set background color
 
