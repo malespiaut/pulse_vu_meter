@@ -600,6 +600,7 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
   //	width = gtk_widget_get_allocated_width (widget);   // of draw window
   //	height = gtk_widget_get_allocated_height (widget); // of draw window
   //-----------------------------------------------------------------------------
+  return TRUE;
 }
 
 //--------------------------------
