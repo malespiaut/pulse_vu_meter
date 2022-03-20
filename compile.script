@@ -1,0 +1,6 @@
+#!/bin/bash
+
+glib-compile-resources --target=resource.c --generate-source resource.xml
+
+gcc -Wno-format -o vumeter-bin vumeter.c pulse.c resource.c -Wno-deprecated-declarations -Wno-format-security `pkg-config --cflags --libs gtkmm-3.0` `pkg-config --cflags --libs gdkmm-3.0` `pkg-config --cflags --libs glibmm-2.4 giomm-2.4` -I/usr/include/glib-2.0 -I/usr/include/gtkmm-3.0 -lm -lfftw3 `pkg-config --cflags --libs gtk+-3.0` -lpulse-mainloop-glib -lpulse  -export-dynamic
+
