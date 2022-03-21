@@ -105,7 +105,7 @@ stream_read_callback_sink(pa_stream* s, size_t l, void* dummy)
     }
 
   float* audio_data = (float*)p;
-  int samples = l / sizeof(float);
+  size_t samples = l / sizeof(float);
   float levels[2] = {0.0};
 
   if (samples < 2)
@@ -171,7 +171,7 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
     }
 
   float* pcm = (float*)p;
-  int samples = len / sizeof(float);
+  size_t samples = len / sizeof(float);
   float levels[2] = {0.0};
 
   if (samples < 2)
