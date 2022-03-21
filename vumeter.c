@@ -72,9 +72,9 @@ main(int argc, char* argv[])
 
   window = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
 
-  g_signal_connect(window, "destroy", G_CALLBACK(on_destroy), NULL);
+  g_signal_connect(window, "destroy", G_CALLBACK(on_destroy), 0);
 
-  gtk_builder_connect_signals(builder, NULL);
+  gtk_builder_connect_signals(builder, 0);
 
   fixed1 = GTK_WIDGET(gtk_builder_get_object(builder, "fixed1"));
   Bars = GTK_WIDGET(gtk_builder_get_object(builder, "Bars"));
@@ -220,7 +220,7 @@ main(int argc, char* argv[])
 
 #include "sink.h"
 
-  g_timeout_add(timer_res, (GSourceFunc)pulse_timer_handler, NULL);
+  g_timeout_add(timer_res, (GSourceFunc)pulse_timer_handler, 0);
 
   gtk_main();
 

@@ -345,17 +345,17 @@ sink_create_stream(const char* name, const char* description,
   //	establish function to be called for status report
   //------------------------------------------------------------------
 
-  pa_stream_set_state_callback(stream_sink, stream_state_callback_sink, NULL);
+  pa_stream_set_state_callback(stream_sink, stream_state_callback_sink, 0);
 
   //------------------------------------------------------------------------
   //	establish function to be called when data is available
   //------------------------------------------------------------------------
 
-  pa_stream_set_read_callback(stream_sink, stream_read_callback_sink, NULL); // establish callback fcn
+  pa_stream_set_read_callback(stream_sink, stream_read_callback_sink, 0); // establish callback fcn
 
   //-----------------------------------------------------------------------------------------
   //	alternate initializations
-  //	pa_stream_connect_record(stream, name, NULL, (enum pa_stream_flags) 0);
+  //	pa_stream_connect_record(stream, name, 0, (enum pa_stream_flags) 0);
   //	pa_stream_connect_record(stream, name, &paba, (enum pa_stream_flags) 0);
   //------------------------------------------------------------------------
 
@@ -425,13 +425,13 @@ source_create_stream(const char* name, const char* description,
   //	establish function to be called for status report
   //------------------------------------------------------------------
 
-  pa_stream_set_state_callback(stream_source, stream_state_callback_source, NULL);
+  pa_stream_set_state_callback(stream_source, stream_state_callback_source, 0);
 
   //------------------------------------------------------------------------
   //	establish function to be called when data is available
   //------------------------------------------------------------------------
 
-  pa_stream_set_read_callback(stream_source, stream_read_callback_source, NULL);
+  pa_stream_set_read_callback(stream_source, stream_read_callback_source, 0);
 
   //--------------------------------------
   //	connect to stream
@@ -572,7 +572,7 @@ sink_server_info_callback(pa_context* c, const pa_server_info* si, void* dummy)
     c,
     si->default_sink_name,
     sink_info_callback,
-    NULL);
+    0);
 
   pa_operation_unref(p1);
 }
@@ -640,7 +640,7 @@ source_server_info_callback(pa_context* c, const pa_server_info* si, void* dummy
   //----------------------------------------------------------
 
   printf("default source name %s\n", si->default_source_name);
-  p1 = pa_context_get_source_info_by_name(c, si->default_source_name, source_info_callback, NULL);
+  p1 = pa_context_get_source_info_by_name(c, si->default_source_name, source_info_callback, 0);
 
   pa_operation_unref(p1);
 }
@@ -724,7 +724,7 @@ sink_connection_state_callback(pa_context* c, void* dummy)
       p1 = pa_context_get_server_info(
         c,
         sink_server_info_callback,
-        NULL);
+        0);
 
       pa_operation_unref(p1);
 

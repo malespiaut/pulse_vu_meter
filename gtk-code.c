@@ -1243,9 +1243,9 @@ spectrum()
 {
   size_t size = SAMPLE_SIZE / 2;
 
-  static float* Hann = NULL;
-  static double* in = NULL;
-  static fftw_complex* out = NULL;
+  static float* Hann = 0;
+  static double* in = 0;
+  static fftw_complex* out = 0;
 
   in = (double*)fftw_malloc(sizeof(double) * size);
   out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * size);

@@ -51,9 +51,9 @@ context_sink = pa_context_new(mla_sink, PULSE_SINK_NAME);
 pa_context_set_state_callback(
   context_sink,
   sink_connection_state_callback,
-  NULL);
+  0);
 
-if (pa_context_connect(context_sink, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL) < 0)
+if (pa_context_connect(context_sink, 0, PA_CONTEXT_NOAUTOSPAWN, 0) < 0)
   printf("*** sink context connect error\n");
 
 printf("*** sink connected\n");
@@ -77,9 +77,9 @@ context_source = pa_context_new(mla_source, PULSE_SOURCE_NAME);
 pa_context_set_state_callback(
   context_source,
   source_connection_state_callback,
-  NULL);
+  0);
 
-if (pa_context_connect(context_source, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL) < 0)
+if (pa_context_connect(context_source, 0, PA_CONTEXT_NOAUTOSPAWN, 0) < 0)
   printf("*** source context connect error\n");
 
 printf("*** source connected\n");
