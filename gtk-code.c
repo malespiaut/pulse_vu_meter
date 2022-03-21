@@ -690,7 +690,7 @@ color_bars(cairo_t* cr, int i, int noLine, int color)
 //------------------------------------------
 
 void
-bar_graph(int lower, double chan[], int i, cairo_t* cr, int connect_graph)
+bar_graph(int lower, double chan[], int i, cairo_t* cr, gboolean connect_lines)
 {
 
   if (chan[i] > G_LIM)
@@ -702,7 +702,7 @@ bar_graph(int lower, double chan[], int i, cairo_t* cr, int connect_graph)
       chan[i + 1] = G_LIM;
     }
 
-  if (connect_graph)
+  if (connect_lines)
     {
       connecting_lines(cr, lower, i, chan); // connecting horizontal graph lines
     }

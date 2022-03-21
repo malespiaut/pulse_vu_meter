@@ -52,7 +52,7 @@ extern GtkBuilder* builder;
 extern int samp1, samp2;
 extern int showArc;
 extern int showB2;
-extern int connect_graph; // whether to connect the bar graph bars
+extern gboolean connect_graph; // whether to connect the bar graph bars
 extern int spectrum_width;
 extern int display_cover;
 extern int no_graph;
@@ -67,7 +67,7 @@ extern char bg_color[256];
 extern int L_Clipping, R_Clipping;
 extern int style;
 
-extern void bar_graph(int lower, double[], int, cairo_t*, int);
+extern void bar_graph(int lower, double[], int, cairo_t*, gboolean);
 extern void color_bars(cairo_t* cr, int, int, int);
 extern void frequency_marks(cairo_t*);
 extern void draw_bars_only(cairo_t* cr, int lower, int i, double chan[]);

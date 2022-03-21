@@ -56,7 +56,7 @@ int samp1 = 0;
 int samp2 = 0;
 int showArc = 0;
 int showB2 = 1;
-int connect_graph = TRUE; // whether to connect the bar graph bars
+gboolean connect_graph = TRUE; // whether to connect the bar graph bars
 int spectrum_width = 1;
 int display_cover = 0;
 int no_graph = 0;
@@ -72,7 +72,7 @@ int L_Clipping = 0;
 int R_Clipping = 0;
 int style = NARROW_SPECTRUM;
 
-void bar_graph(int lower, double[], int, cairo_t*, int);
+void bar_graph(int lower, double[], int, cairo_t*, gboolean);
 void color_bars(cairo_t* cr, int, int, int);
 void frequency_marks(cairo_t*);
 void draw_bars_only(cairo_t* cr, int lower, int i, double chan[]);
