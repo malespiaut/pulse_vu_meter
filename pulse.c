@@ -106,7 +106,6 @@ stream_read_callback_sink(pa_stream* s, size_t l, void* dummy)
 
   float* audio_data = (float*)p;
   int samples = l / sizeof(float);
-  int nchan = sink_channels;
   float levels[2] = {0.0};
 
   if (samples < 2)
@@ -124,9 +123,9 @@ stream_read_callback_sink(pa_stream* s, size_t l, void* dummy)
       exchange = 1;
     }
 
-  while (samples >= nchan)
+  while (samples >= sink_channels)
     {
-      for (size_t c = 0; c < nchan; c++)
+      for (size_t c = 0; c < sink_channels; c++)
         {
           float v = fabs(audio_data[c]);
           if (v > levels[c])
@@ -134,8 +133,8 @@ stream_read_callback_sink(pa_stream* s, size_t l, void* dummy)
               levels[c] = v;
             }
         }
-      audio_data += nchan;
-      samples -= nchan;
+      audio_data += sink_channels;
+      samples -= sink_channels;
     }
 
   if (LeftChan < levels[0])
@@ -173,7 +172,6 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
 
   float* pcm = (float*)p;
   int samples = len / sizeof(float);
-  int nchan = source_channels;
   float levels[2] = {0.0};
 
   if (samples < 2)
@@ -182,9 +180,9 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
       return;
     }
 
-  while (samples >= nchan)
+  while (samples >= source_channels)
     {
-      for (size_t c = 0; c < nchan; c++)
+      for (size_t c = 0; c < source_channels; c++)
         {
           float v = fabs(pcm[c]);
           if (v > levels[c])
@@ -192,8 +190,8 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
               levels[c] = v;
             }
         }
-      pcm += nchan;
-      samples -= nchan;
+      pcm += source_channels;
+      samples -= source_channels;
     }
 
   if (MLx < levels[0])
@@ -208,7 +206,7 @@ stream_read_callback_source(pa_stream* s, size_t len, void* user)
   ML = MLx;
   MR = MRx;
 
-  if (nchan == 2)
+  if (source_channels == 2)
     {
       ML = (ML + MR) / 2; // average
     }
@@ -494,7 +492,7 @@ source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void*
         }
       printf("+++ pa_source_port_info active port name: %s\n", si->active_port->name);
       printf("\n");
-      printf("+++ source channels %d\n", source_channels);
+      printf("+++ source channels %ld\n", source_channels);
       printf("+++ map to name: %s\n", pa_channel_map_to_name(&si->channel_map));
       printf("+++ description: %s\n", si->description);
     }
@@ -532,7 +530,7 @@ sink_info_callback(pa_context* p, const pa_sink_info* si, int is_last, void* dum
 
   sink_channels = si->channel_map.channels;
 
-  printf("sink channels %d\n", sink_channels);
+  printf("sink channels %ld\n", sink_channels);
 
   sink_create_stream(si->monitor_source_name, si->description, si->sample_spec, si->channel_map);
 }

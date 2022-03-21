@@ -95,8 +95,8 @@ char default_sink[1024] = {0};
 int no_microphone = 1;
 float exchangeBuf[SAMPLE_SIZE] = {NAN};
 int exchange = 0;
-int sink_channels = 0;
-int source_channels = 0;
+size_t sink_channels = 0;
+size_t source_channels = 0;
 int super_bars = 1; // bars above graphs
 
 double MaxR[RMX] = {0.0};

@@ -83,7 +83,8 @@ extern char default_sink[1024];
 extern int no_microphone;
 extern float exchangeBuf[SAMPLE_SIZE];
 extern int exchange;
-extern int sink_channels, source_channels;
+extern size_t sink_channels;
+extern size_t source_channels;
 extern int super_bars; // bars above graphs
 
 #define RMX 5
