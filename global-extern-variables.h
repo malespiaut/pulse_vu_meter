@@ -27,6 +27,8 @@
 
 // August 14, 2021
 
+#pragma once
+
 extern pa_glib_mainloop* m_sink;   // internal audio - sink
 extern pa_glib_mainloop* m_source; // pulse audio microphone - source
 

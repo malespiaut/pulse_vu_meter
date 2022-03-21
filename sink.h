@@ -27,6 +27,8 @@
 
 // August 12, 2021
 
+#pragma once
+
 //----------------------------------------------
 //	PulseAudio interface
 //	SINK (players) SINK SINK SINK SINK SINK
