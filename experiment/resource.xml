@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="part1">
+    <file preprocess="xml-stripblanks">part1.glade</file>
+    <file>icons/meter.png</file>
+  </gresource>
+</gresources>
