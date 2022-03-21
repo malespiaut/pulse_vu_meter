@@ -938,7 +938,7 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
 
   if (t1 < 0.1)
     {
-      MaxRM = 0.;
+      MaxRM = 0.0;
     }
   else if (t1 > MaxRM)
     {
