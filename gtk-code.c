@@ -482,6 +482,7 @@ float UPPER_MAX_MAX = DRAW_HEIGHT - DRAW_HEIGHT / 20.0;
 gboolean
 on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
 {
+  (void)widget;
 
   int noLine = 0;
 
@@ -799,6 +800,7 @@ connecting_lines(cairo_t* cr, int lower, int i, double chan[])
 gboolean
 on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
 {
+  (void)widget;
 
   double hor, ver, t1, len;
 
