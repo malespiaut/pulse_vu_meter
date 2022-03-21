@@ -1186,7 +1186,7 @@ on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr)
 int maxHeight = 100; // display window max from midpoint
 
 void
-fftTobars(fftw_complex* fft, int size, int* bars)
+fftTobars(fftw_complex* fft, int* bars)
 {
 
   double strength, real, imagin, scale;
@@ -1279,7 +1279,7 @@ spectrum()
 
   fftw_execute(plan);
 
-  fftTobars(out, size, barsL);
+  fftTobars(out, barsL);
 
   double F = 1.0;
 
@@ -1325,7 +1325,7 @@ spectrum()
   //	for(int i = 0; i < size; i++) in[i] = Hann[i] * buffer[i];
 
   fftw_execute(plan);
-  fftTobars(out, size, barsR);
+  fftTobars(out, barsR);
 
   F = 1.0;
   for (size_t i = 0; i < WindowWidth / 2; i++)
