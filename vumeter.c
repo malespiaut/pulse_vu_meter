@@ -218,7 +218,43 @@ main(int argc, char* argv[])
       gtk_window_resize(GTK_WINDOW(window), 20, 20);
     }
 
-#include "sink.h"
+  // PLAYER SINK
+  printf("\n------------------ sink connect --------\n");
+
+  GMainContext* mcd_sink = 0;
+  pa_mainloop_api* mla_sink = 0;
+
+  mcd_sink = g_main_context_default();
+  m_sink = pa_glib_mainloop_new(mcd_sink);
+  mla_sink = pa_glib_mainloop_get_api(m_sink);
+  context_sink = pa_context_new(mla_sink, PULSE_SINK_NAME);
+  pa_context_set_state_callback(context_sink, sink_connection_state_callback, 0);
+
+  if (pa_context_connect(context_sink, 0, PA_CONTEXT_NOAUTOSPAWN, 0) < 0)
+    {
+      printf("*** sink context connect error\n");
+    }
+  printf("*** sink connected\n");
+
+  // MICROPHONE SOURCE
+  printf("\n------------------ source connect --------\n");
+
+  GMainContext* mcd_source = 0;
+  pa_mainloop_api* mla_source = 0;
+
+  mcd_source = g_main_context_default();
+  m_source = pa_glib_mainloop_new(mcd_source);
+  mla_source = pa_glib_mainloop_get_api(m_source);
+  context_source = pa_context_new(mla_source, PULSE_SOURCE_NAME);
+  pa_context_set_state_callback(context_source, source_connection_state_callback, 0);
+
+  if (pa_context_connect(context_source, 0, PA_CONTEXT_NOAUTOSPAWN, 0) < 0)
+    {
+      printf("*** source context connect error\n");
+    }
+  printf("*** source connected\n");
+
+  //---
 
   g_timeout_add(timer_res, (GSourceFunc)pulse_timer_handler, 0);
 
