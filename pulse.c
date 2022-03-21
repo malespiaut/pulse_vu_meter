@@ -478,7 +478,7 @@ source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void*
 
   printf("+++ name: %s\n", si->name);
   printf("+++ index: %d\n", si->index);
-  printf("+++ volume: %d\n", si->volume);
+  //printf("+++ volume: %d\n", si->volume); //FIXME! How to get PulseAudio volume?
   printf("+++ n_ports: %d\n", si->n_ports);
   printf("\n");
 
