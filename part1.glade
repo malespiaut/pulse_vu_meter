@@ -29,6 +29,7 @@ Author: Kevin C. O'Kane
   <!-- interface-authors Kevin C. O'Kane -->
   <object class="GtkWindow" id="window">
     <property name="can-focus">False</property>
+    <property name="resizable">False</property>
     <property name="title" translatable="yes">SGR Meters</property>
     <property name="icon-name">audio-speakers</property>
     <child>
