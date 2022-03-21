@@ -500,7 +500,8 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
       //	frequency graph
       //------------------------
 
-      double blchan[100], brchan[100];
+      double blchan[100] = {NAN};
+      double brchan[100] = {NAN};
 
       for (size_t i = 0; i < 100; i++)
         {
