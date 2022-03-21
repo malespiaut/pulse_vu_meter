@@ -42,8 +42,6 @@ Author: Kevin C. O'Kane
             <property name="height-request">105</property>
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="margin-left">2</property>
-            <property name="margin-right">2</property>
             <property name="margin-top">2</property>
             <property name="margin-bottom">2</property>
             <signal name="draw" handler="on_draw1_draw" swapped="no"/>
