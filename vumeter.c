@@ -98,7 +98,7 @@ main(int argc, char* argv[])
   GtkStyleContext* style_context = gtk_widget_get_style_context(window);
   gtk_style_context_add_provider(style_context, GTK_STYLE_PROVIDER(css_provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 
-  char cmd[1024];
+  char cmd[1024] = {0};
   strcpy(cmd, "Spark Gap Radio Meters 2.1");
   gtk_window_set_title(GTK_WINDOW(window), cmd);
 

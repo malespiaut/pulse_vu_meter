@@ -49,14 +49,14 @@
 char*
 sink_name()
 {
-  static char x[32];
+  static char x[32] = {0};
   sprintf(x, "sink%d", getpid());
   return x;
 }
 char*
 source_name()
 {
-  static char x[32];
+  static char x[32] = {0};
   sprintf(x, "source%d", getpid());
   return x;
 }
@@ -303,7 +303,7 @@ sink_create_stream(const char* name, const char* description,
   (void)description;
   // PLAY
 
-  char txt[256];
+  char txt[256] = {0};
   pa_sample_spec nss;
 
   /*------------------------------------------------------------------------------------
@@ -383,7 +383,7 @@ source_create_stream(const char* name, const char* description,
   (void)description;
   // MIKE
 
-  char txt[256];
+  char txt[256] = {0};
   pa_sample_spec nss;
 
   /*------------------------------------------------------------------------------------
@@ -469,7 +469,7 @@ source_info_callback(pa_context* p, const pa_source_info* si, int is_last, void*
       return;
     }
 
-  char txt[255];
+  char txt[255] = {0};
 
   source_channels = si->channel_map.channels;
 
