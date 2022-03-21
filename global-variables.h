@@ -52,7 +52,8 @@ GtkWidget* vumeter2 = 0;
 GtkWidget* vumeter3 = 0;
 GtkBuilder* builder = 0;
 
-int samp1, samp2;
+int samp1 = 0;
+int samp2 = 0;
 int showArc = 0;
 int showB2 = 1;
 int connect_graph = TRUE; // whether to connect the bar graph bars
