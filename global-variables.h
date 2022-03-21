@@ -72,13 +72,13 @@ int L_Clipping = 0;
 int R_Clipping = 0;
 int style = NARROW_SPECTRUM;
 
-void bar_graph(int lower, double[], int, cairo_t*, gboolean);
-void color_bars(cairo_t* cr, int, int, int);
+void bar_graph(int, double[], size_t, cairo_t*, gboolean);
+void color_bars(cairo_t*, size_t, int, int);
 void frequency_marks(cairo_t*);
-void draw_bars_only(cairo_t* cr, int lower, int i, double chan[]);
-void connecting_lines(cairo_t*, int, int, double[]);
+void draw_bars_only(cairo_t*, int, size_t, double[]);
+void connecting_lines(cairo_t*, int, size_t, double[]);
 gboolean on_draw1_draw(GtkDrawingArea*, cairo_t*);
-gboolean on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr);
+gboolean on_draw2_draw(GtkDrawingArea*, cairo_t*);
 double FACTOR = 350.0;
 double LeftChan = NAN;
 double RightChan = NAN;

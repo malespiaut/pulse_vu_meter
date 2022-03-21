@@ -67,13 +67,13 @@ extern char bg_color[256];
 extern int L_Clipping, R_Clipping;
 extern int style;
 
-extern void bar_graph(int lower, double[], int, cairo_t*, gboolean);
-extern void color_bars(cairo_t* cr, int, int, int);
+extern void bar_graph(int, double[], size_t, cairo_t*, gboolean);
+extern void color_bars(cairo_t*, size_t, int, int);
 extern void frequency_marks(cairo_t*);
-extern void draw_bars_only(cairo_t* cr, int lower, int i, double chan[]);
-extern void connecting_lines(cairo_t*, int, int, double[]);
+extern void draw_bars_only(cairo_t*, int, size_t, double[]);
+extern void connecting_lines(cairo_t*, int, size_t, double[]);
 extern gboolean on_draw1_draw(GtkDrawingArea*, cairo_t*);
-extern gboolean on_draw2_draw(GtkDrawingArea* widget, cairo_t* cr);
+extern gboolean on_draw2_draw(GtkDrawingArea*, cairo_t*);
 extern int style; // narrow
 extern double FACTOR, LeftChan, RightChan, Lx, Rx;
 extern double rUtil, srchan[100], rchan[100];

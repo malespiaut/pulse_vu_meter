@@ -612,7 +612,7 @@ on_draw1_draw(GtkDrawingArea* widget, cairo_t* cr)
 //--------------------------------
 
 void
-color_bars(cairo_t* cr, int i, int noLine, int color)
+color_bars(cairo_t* cr, size_t i, int noLine, int color)
 {
 
   if ((style == WIDE_SPECTRUM || style == NARROW_SPECTRUM) && !super_bars)
@@ -694,7 +694,7 @@ color_bars(cairo_t* cr, int i, int noLine, int color)
 //------------------------------------------
 
 void
-bar_graph(int lower, double chan[], int i, cairo_t* cr, gboolean connect_lines)
+bar_graph(int lower, double chan[], size_t i, cairo_t* cr, gboolean connect_lines)
 {
 
   if (chan[i] > G_LIM)
@@ -719,7 +719,7 @@ bar_graph(int lower, double chan[], int i, cairo_t* cr, gboolean connect_lines)
 //-----------------------------
 
 void
-draw_bars_only(cairo_t* cr, int lower, int i, double chan[])
+draw_bars_only(cairo_t* cr, int lower, size_t i, double chan[])
 {
 
   if (chan[i + 1] > 1.0)
@@ -753,7 +753,7 @@ draw_bars_only(cairo_t* cr, int lower, int i, double chan[])
 //-------------------------------------------------
 
 void
-connecting_lines(cairo_t* cr, int lower, int i, double chan[])
+connecting_lines(cairo_t* cr, int lower, size_t i, double chan[])
 {
 
   if (i < 98)
