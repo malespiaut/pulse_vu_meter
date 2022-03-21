@@ -52,8 +52,10 @@
 //--------------------------------------------------------------------
 
 gboolean
-pulse_timer_handler()
+pulse_timer_handler(gpointer user_data)
 { // check pulse every 100 millisecs
+
+  (void)user_data;
 
   rUtil = log10(RightChan + 1) * FACTOR;
   lUtil = log10(LeftChan + 1) * FACTOR;

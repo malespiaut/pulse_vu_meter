@@ -62,7 +62,7 @@ void stream_read_callback_sink(pa_stream*, size_t, void*);
 void stream_read_callback_source(pa_stream*, size_t, void*);
 void stream_state_callback_source(pa_stream*, void*);
 
-gboolean pulse_timer_handler(void);
+gboolean pulse_timer_handler(gpointer);
 
 #define SAMPLE_SIZE 400
 #define PULSE_TIME 100 // granualrity of pulse calls - see sink.h
